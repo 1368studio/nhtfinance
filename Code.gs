@@ -1590,6 +1590,28 @@ function getSystemInfo() {
   }
 }
 
+function include(filename) {
+  try {
+    console.log(`📄 Including file: ${filename}`);
+    return HtmlService.createHtmlOutputFromFile(filename).getContent();
+  } catch (error) {
+    console.error(`❌ Error including file ${filename}:`, error);
+    
+    // Fallback content based on filename
+    if (filename.includes('Stylesheet')) {
+      return `/* Error loading ${filename}: ${error.message} */
+              body { font-family: Arial, sans-serif; margin: 20px; }
+              .error { color: red; background: #ffebee; padding: 10px; border-radius: 4px; }`;
+    } else if (filename.includes('JavaScript')) {
+      return `/* Error loading ${filename}: ${error.message} */
+              console.error('Failed to load JavaScript file');
+              document.body.innerHTML = '<div class="error">Lỗi tải JavaScript. Vui lòng làm mới trang.</div>';`;
+    }
+    
+    return `/* Error loading ${filename}: ${error.message} */`;
+  }
+}
+
 // =================== END OF FILE ===================
 
 console.log('✅ NHT_Code.gs loaded successfully - All functions defined');
