@@ -79,44 +79,71 @@ function initializeApp() {
     console.log('🎯 Initializing app for user:', currentUser);
     
     try {
-        // Update user display
         updateUserDisplay();
         
-        // Initialize sample data on first run
+        // Thử load data từ server trước
         google.script.run
             .withSuccessHandler(function(result) {
                 console.log('✅ Sample data check completed:', result);
-                
-                // Load initial data after ensuring sample data exists
                 loadDashboardData();
-                
-                // Show success notification
                 showNotification('Đăng nhập thành công! Chào mừng ' + (currentUser.fullName || currentUser.username), 'success');
-                
-                console.log('✅ App initialized successfully');
             })
             .withFailureHandler(function(error) {
-                console.error('❌ Error initializing sample data:', error);
-                
-                // Still try to load data even if sample data fails
-                loadDashboardData();
-                
-                showNotification('Đăng nhập thành công!', 'success');
+                console.error('❌ Error from server:', error);
+                // Fallback: load with dummy data
+                loadDummyData();
+                showNotification('Đăng nhập thành công! (Chế độ offline)', 'warning');
             })
             .initializeSampleData();
         
     } catch (error) {
         console.error('❌ Error initializing app:', error);
-        showNotification('Có lỗi xảy ra khi khởi tạo ứng dụng', 'error');
-        
-        // Try to continue anyway
-        try {
-            updateUserDisplay();
-            loadDashboardData();
-        } catch (fallbackError) {
-            console.error('❌ Fallback initialization also failed:', fallbackError);
-        }
+        // Emergency fallback
+        loadDummyData();
+        showNotification('Đã xảy ra lỗi, đang chạy ở chế độ demo', 'warning');
     }
+}
+
+// Thêm function fallback
+function loadDummyData() {
+    // Load dummy data khi server không phản hồi
+    transactions = [
+        {
+            id: 'GD000001',
+            date: '2024-01-15',
+            type: 'Thu',
+            category: 'Lương',
+            amount: 15000000,
+            account: 'Vietcombank',
+            note: 'Lương tháng 1',
+            status: 'Hoàn thành'
+        },
+        {
+            id: 'GD000002', 
+            date: '2024-01-16',
+            type: 'Chi',
+            category: 'Ăn uống',
+            amount: 500000,
+            account: 'Tiền mặt',
+            note: 'Ăn trưa',
+            status: 'Hoàn thành'
+        }
+    ];
+    
+    accounts = [
+        { id: 'TK000001', name: 'Tiền mặt', type: 'Tiền mặt', balance: 1000000 },
+        { id: 'TK000002', name: 'Vietcombank', type: 'Ngân hàng', balance: 5000000 }
+    ];
+    
+    categories = [
+        { id: 'DM000001', name: 'Lương', type: 'Thu', description: 'Lương tháng' },
+        { id: 'DM000002', name: 'Ăn uống', type: 'Chi', description: 'Chi phí ăn uống' }
+    ];
+    
+    updateDashboardStats();
+    displayRecentTransactions();
+    populateAccountDropdown();
+    populateCategoryDropdown();
 }
 
 // =================== EVENT LISTENERS ===================
