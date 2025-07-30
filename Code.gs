@@ -13,6 +13,22 @@ const SHEET_NAMES = {
 };
 
 /**
+ * Simple test function - MUST WORK
+ */
+function simpleTest() {
+  console.log('🧪 simpleTest called from frontend');
+  return {
+    success: true,
+    message: 'Backend is working!',
+    timestamp: new Date().toISOString(),
+    sampleData: {
+      transactions: [{ id: 'TEST', type: 'Doanh thu', amount: 1000000 }],
+      accounts: [{ id: 'TEST', name: 'Test Account', balance: 5000000 }]
+    }
+  };
+}
+
+/**
  * Main entry point for the web application
  */
 function doGet() {
@@ -212,26 +228,32 @@ function isPasswordMatch(inputPassword, dbPassword) {
 /**
  * Get all data needed for the app
  */
-function getAllData() {
+function getAllDataNew() {
   try {
-    console.log('📊 Loading all app data...');
+    console.log('📊 getAllDataNew() called - BYPASS CACHE VERSION');
     
-    return {
+    const result = {
       transactions: getTransactions(),
       accounts: getAccounts(), 
       categories: getCategories(),
       customers: getCustomers(),
-      suppliers: getSuppliers()
+      suppliers: getSuppliers(),
+      version: 'NEW_VERSION',
+      timestamp: new Date().toISOString()
     };
     
+    console.log('📊 getAllDataNew result:', result);
+    return result;
+    
   } catch (error) {
-    console.error('❌ Error loading app data:', error);
+    console.error('❌ Error in getAllDataNew:', error);
     return {
       transactions: [],
       accounts: [],
       categories: [],
       customers: [],
-      suppliers: []
+      suppliers: [],
+      error: error.toString()
     };
   }
 }
@@ -414,31 +436,61 @@ function handleApiError(error) {
  */
 function getTransactions() {
   try {
+    console.log('📊 Getting transactions from sheet...');
+    
     const sheet = getSheetByName(SHEET_NAMES.TRANSACTIONS);
+    if (!sheet) {
+      console.log('⚠️ Transactions sheet not found');
+      return [];
+    }
+    
     const data = sheet.getDataRange().getValues();
+    console.log(`📋 Raw transactions data rows: ${data.length}`);
     
-    if (data.length <= 1) return [];
+    if (data.length <= 1) {
+      console.log('ℹ️ No transaction data (only headers or empty)');
+      return [];
+    }
     
-    return data.slice(1).map(row => ({
-      id: row[0],                    // ID
-      date: row[1],                  // Ngày
-      type: row[2],                  // Loại
-      category: row[3],              // Danh mục
-      amount: row[4],                // Số tiền
-      account: row[5],               // Tài khoản nguồn
-      targetAccount: row[6],         // Tài khoản đích
-      note: row[7],                  // Ghi chú
-      invoiceNumber: row[8],         // Số hóa đơn
-      invoiceDate: row[9],           // Ngày hóa đơn
-      objectName: row[10],           // Tên đối tượng
-      objectType: row[11],           // Loại đối tượng
-      employee: row[12],             // Nhân viên/Bộ phận
-      status: row[13],               // Trạng thái thanh toán
-      dueDate: row[14],              // Ngày đến hạn
-      paymentDate: row[15]           // Ngày thanh toán
-    }));
+    const transactions = data.slice(1).map((row, index) => {
+      try {
+        return {
+          id: row[0] || `TRANS_${index + 1}`,                    // ID
+          date: row[1] || new Date(),                            // Ngày
+          type: row[2] || 'Doanh thu',                          // Loại
+          category: row[3] || 'Khác',                           // Danh mục
+          amount: parseFloat(row[4]) || 0,                      // Số tiền
+          account: row[5] || 'Tài khoản mặc định',             // Tài khoản nguồn
+          targetAccount: row[6] || '',                          // Tài khoản đích
+          note: row[7] || '',                                   // Ghi chú
+          invoiceNumber: row[8] || '',                          // Số hóa đơn
+          invoiceDate: row[9] || '',                            // Ngày hóa đơn
+          objectName: row[10] || '',                            // Tên đối tượng
+          objectType: row[11] || '',                            // Loại đối tượng
+          employee: row[12] || '',                              // Nhân viên/Bộ phận
+          status: row[13] || 'Hoàn thành',                      // Trạng thái thanh toán
+          dueDate: row[14] || '',                               // Ngày đến hạn
+          paymentDate: row[15] || ''                            // Ngày thanh toán
+        };
+      } catch (rowError) {
+        console.error(`❌ Error processing transaction row ${index + 1}:`, rowError);
+        return {
+          id: `ERROR_${index + 1}`,
+          date: new Date(),
+          type: 'Doanh thu',
+          category: 'Lỗi dữ liệu',
+          amount: 0,
+          account: 'Unknown',
+          note: 'Lỗi xử lý dữ liệu'
+        };
+      }
+    });
+    
+    console.log(`✅ Processed ${transactions.length} transactions`);
+    return transactions;
+    
   } catch (error) {
-    console.error('Error getting transactions:', error);
+    console.error('❌ Error in getTransactions:', error);
     return [];
   }
 }
@@ -509,23 +561,51 @@ function deleteTransaction(transactionId) {
  */
 function getAccounts() {
   try {
+    console.log('💰 Getting accounts from sheet...');
+    
     const sheet = getSheetByName(SHEET_NAMES.ACCOUNTS);
+    if (!sheet) {
+      console.log('⚠️ Accounts sheet not found');
+      return [];
+    }
+    
     const data = sheet.getDataRange().getValues();
+    console.log(`📋 Raw accounts data rows: ${data.length}`);
     
-    if (data.length <= 1) return [];
+    if (data.length <= 1) {
+      console.log('ℹ️ No account data (only headers or empty)');
+      return [];
+    }
     
-    return data.slice(1).map(row => ({
-      id: row[0],                    // ID
-      name: row[1],                  // Tên
-      type: row[2],                  // Loại
-      initialBalance: row[3],        // Số dư đầu kỳ
-      balance: row[4],               // Số dư hiện tại
-      icon: row[5],                  // Icon
-      bankInfo: row[6],              // Thông tin ngân hàng
-      accountNumber: row[7]          // Số tài khoản
-    }));
+    const accounts = data.slice(1).map((row, index) => {
+      try {
+        return {
+          id: row[0] || `ACC_${index + 1}`,                    // ID
+          name: row[1] || `Tài khoản ${index + 1}`,           // Tên
+          type: row[2] || 'Tiền mặt',                         // Loại
+          initialBalance: parseFloat(row[3]) || 0,            // Số dư đầu kỳ
+          balance: parseFloat(row[4]) || 0,                   // Số dư hiện tại
+          icon: row[5] || '💰',                               // Icon
+          bankInfo: row[6] || '',                             // Thông tin ngân hàng
+          accountNumber: row[7] || ''                         // Số tài khoản
+        };
+      } catch (rowError) {
+        console.error(`❌ Error processing account row ${index + 1}:`, rowError);
+        return {
+          id: `ERROR_${index + 1}`,
+          name: `Lỗi tài khoản ${index + 1}`,
+          type: 'Unknown',
+          balance: 0,
+          icon: '❌'
+        };
+      }
+    });
+    
+    console.log(`✅ Processed ${accounts.length} accounts`);
+    return accounts;
+    
   } catch (error) {
-    console.error('Error getting accounts:', error);
+    console.error('❌ Error in getAccounts:', error);
     return [];
   }
 }
@@ -564,19 +644,46 @@ function addAccount(account) {
  */
 function getCategories() {
   try {
+    console.log('📁 Getting categories from sheet...');
+    
     const sheet = getSheetByName(SHEET_NAMES.CATEGORIES);
+    if (!sheet) {
+      console.log('⚠️ Categories sheet not found');
+      return [];
+    }
+    
     const data = sheet.getDataRange().getValues();
+    console.log(`📋 Raw categories data rows: ${data.length}`);
     
-    if (data.length <= 1) return [];
+    if (data.length <= 1) {
+      console.log('ℹ️ No category data (only headers or empty)');
+      return [];
+    }
     
-    return data.slice(1).map(row => ({
-      id: row[0],        // ID
-      name: row[1],      // Tên
-      type: row[2],      // Loại
-      icon: row[3]       // Icon
-    }));
+    const categories = data.slice(1).map((row, index) => {
+      try {
+        return {
+          id: row[0] || `CAT_${index + 1}`,                   // ID
+          name: row[1] || `Danh mục ${index + 1}`,           // Tên
+          type: row[2] || 'Doanh thu',                       // Loại
+          icon: row[3] || '📁'                               // Icon
+        };
+      } catch (rowError) {
+        console.error(`❌ Error processing category row ${index + 1}:`, rowError);
+        return {
+          id: `ERROR_${index + 1}`,
+          name: `Lỗi danh mục ${index + 1}`,
+          type: 'Unknown',
+          icon: '❌'
+        };
+      }
+    });
+    
+    console.log(`✅ Processed ${categories.length} categories`);
+    return categories;
+    
   } catch (error) {
-    console.error('Error getting categories:', error);
+    console.error('❌ Error in getCategories:', error);
     return [];
   }
 }
@@ -611,24 +718,54 @@ function addCategory(category) {
  */
 function getCustomers() {
   try {
+    console.log('👥 Getting customers from sheet...');
+    
     const sheet = getSheetByName(SHEET_NAMES.CUSTOMERS);
+    if (!sheet) {
+      console.log('⚠️ Customers sheet not found');
+      return [];
+    }
+    
     const data = sheet.getDataRange().getValues();
+    console.log(`📋 Raw customers data rows: ${data.length}`);
     
-    if (data.length <= 1) return [];
+    if (data.length <= 1) {
+      console.log('ℹ️ No customer data (only headers or empty)');
+      return [];
+    }
     
-    return data.slice(1).map(row => ({
-      id: row[0],          // ID
-      name: row[1],        // Tên
-      phone: row[2],       // Số điện thoại
-      email: row[3],       // Email
-      address: row[4],     // Địa chỉ
-      taxCode: row[5],     // Mã số thuế
-      contact: row[6],     // Người liên hệ
-      note: row[7],        // Ghi chú
-      balance: row[8]      // Số dư công nợ
-    }));
+    const customers = data.slice(1).map((row, index) => {
+      try {
+        return {
+          id: row[0] || `CUST_${index + 1}`,                 // ID
+          name: row[1] || `Khách hàng ${index + 1}`,         // Tên
+          phone: row[2] || '',                               // Số điện thoại
+          email: row[3] || '',                               // Email
+          address: row[4] || '',                             // Địa chỉ
+          taxCode: row[5] || '',                             // Mã số thuế
+          contact: row[6] || '',                             // Người liên hệ
+          note: row[7] || '',                                // Ghi chú
+          balance: parseFloat(row[8]) || 0,                  // Số dư công nợ
+          createdDate: row[9] || new Date()                  // Ngày tạo (if available)
+        };
+      } catch (rowError) {
+        console.error(`❌ Error processing customer row ${index + 1}:`, rowError);
+        return {
+          id: `ERROR_${index + 1}`,
+          name: `Lỗi khách hàng ${index + 1}`,
+          phone: '',
+          email: '',
+          address: '',
+          balance: 0
+        };
+      }
+    });
+    
+    console.log(`✅ Processed ${customers.length} customers`);
+    return customers;
+    
   } catch (error) {
-    console.error('Error getting customers:', error);
+    console.error('❌ Error in getCustomers:', error);
     return [];
   }
 }
@@ -668,24 +805,54 @@ function addCustomer(customer) {
  */
 function getSuppliers() {
   try {
+    console.log('🚚 Getting suppliers from sheet...');
+    
     const sheet = getSheetByName(SHEET_NAMES.SUPPLIERS);
+    if (!sheet) {
+      console.log('⚠️ Suppliers sheet not found');
+      return [];
+    }
+    
     const data = sheet.getDataRange().getValues();
+    console.log(`📋 Raw suppliers data rows: ${data.length}`);
     
-    if (data.length <= 1) return [];
+    if (data.length <= 1) {
+      console.log('ℹ️ No supplier data (only headers or empty)');
+      return [];
+    }
     
-    return data.slice(1).map(row => ({
-      id: row[0],          // ID
-      name: row[1],        // Tên
-      phone: row[2],       // Số điện thoại
-      email: row[3],       // Email
-      address: row[4],     // Địa chỉ
-      taxCode: row[5],     // Mã số thuế
-      contact: row[6],     // Người liên hệ
-      note: row[7],        // Ghi chú
-      balance: row[8]      // Số dư công nợ
-    }));
+    const suppliers = data.slice(1).map((row, index) => {
+      try {
+        return {
+          id: row[0] || `SUPP_${index + 1}`,                 // ID
+          name: row[1] || `Nhà cung cấp ${index + 1}`,       // Tên
+          phone: row[2] || '',                               // Số điện thoại
+          email: row[3] || '',                               // Email
+          address: row[4] || '',                             // Địa chỉ
+          taxCode: row[5] || '',                             // Mã số thuế
+          contact: row[6] || '',                             // Người liên hệ
+          note: row[7] || '',                                // Ghi chú
+          balance: parseFloat(row[8]) || 0,                  // Số dư công nợ
+          createdDate: row[9] || new Date()                  // Ngày tạo (if available)
+        };
+      } catch (rowError) {
+        console.error(`❌ Error processing supplier row ${index + 1}:`, rowError);
+        return {
+          id: `ERROR_${index + 1}`,
+          name: `Lỗi nhà cung cấp ${index + 1}`,
+          phone: '',
+          email: '',
+          address: '',
+          balance: 0
+        };
+      }
+    });
+    
+    console.log(`✅ Processed ${suppliers.length} suppliers`);
+    return suppliers;
+    
   } catch (error) {
-    console.error('Error getting suppliers:', error);
+    console.error('❌ Error in getSuppliers:', error);
     return [];
   }
 }
@@ -998,6 +1165,84 @@ function testDataLoad() {
   } catch (error) {
     console.error('❌ Error in testDataLoad:', error);
     return handleApiError(error);
+  }
+}
+
+// =================== DEBUG TEST FUNCTION - THÊM VÀO CODE.GS ===================
+
+/**
+ * Simple test function to verify frontend-backend connection
+ */
+function testConnection() {
+  console.log('🧪 testConnection() called from frontend');
+  return {
+    success: true,
+    message: 'Backend connection working!',
+    timestamp: new Date().toISOString(),
+    testData: {
+      transactions: [
+        { id: 'TEST_001', type: 'Doanh thu', amount: 1000000, account: 'Test Account' }
+      ],
+      accounts: [
+        { id: 'TEST_ACC', name: 'Test Account', balance: 5000000 }
+      ],
+      categories: [
+        { id: 'TEST_CAT', name: 'Test Category', type: 'Doanh thu' }
+      ]
+    }
+  };
+}
+
+/**
+ * Enhanced getAllData with more debug info
+ */
+function getAllDataEnhanced() {
+  try {
+    console.log('🚀 getAllDataEnhanced() called');
+    console.log('📅 Timestamp:', new Date().toISOString());
+    
+    // Test basic spreadsheet access first
+    console.log('🔍 Testing spreadsheet access...');
+    const ss = getSpreadsheet();
+    console.log('✅ Spreadsheet ID:', ss.getId());
+    console.log('✅ Spreadsheet Name:', ss.getName());
+    
+    // Test sheet access
+    console.log('📋 Testing sheet access...');
+    const allSheets = ss.getSheets().map(sheet => sheet.getName());
+    console.log('📋 Available sheets:', allSheets);
+    
+    // Call the original getAllData
+    const result = getAllData();
+    
+    // Add debug info to result
+    const enhancedResult = {
+      ...result,
+      debug: {
+        timestamp: new Date().toISOString(),
+        spreadsheetId: ss.getId(),
+        availableSheets: allSheets,
+        callStack: 'getAllDataEnhanced -> getAllData'
+      }
+    };
+    
+    console.log('📊 Enhanced result prepared:', enhancedResult);
+    return enhancedResult;
+    
+  } catch (error) {
+    console.error('❌ Error in getAllDataEnhanced:', error);
+    return {
+      transactions: [],
+      accounts: [],
+      categories: [],
+      customers: [],
+      suppliers: [],
+      error: {
+        message: error.toString(),
+        stack: error.stack,
+        timestamp: new Date().toISOString()
+      }
+    };
   }
 }
 
