@@ -1,4 +1,16 @@
-// =================== NHT_Code.gs - UPDATED WITH SIMPLE LOGIN ===================
+// =================== NHT_Code.gs - FIXED SHEET NAMES ===================
+
+/**
+ * CẤU HÌNH TÊN SHEET - THAY ĐỔI CHỖ NÀY THEO TÊN SHEET THỰC TẾ CỦA BẠN
+ */
+const SHEET_NAMES = {
+  TRANSACTIONS: 'Transactions',    // Thay bằng tên sheet giao dịch thực tế
+  ACCOUNTS: 'Accounts',           // Thay bằng tên sheet tài khoản thực tế  
+  CATEGORIES: 'Categories',       // Thay bằng tên sheet danh mục thực tế
+  CUSTOMERS: 'Customers',         // Thay bằng tên sheet khách hàng thực tế
+  SUPPLIERS: 'Suppliers',         // Thay bằng tên sheet nhà cung cấp thực tế
+  USERS: 'Users'                  // Thay bằng tên sheet users thực tế
+};
 
 /**
  * Main entry point for the web application
@@ -128,7 +140,7 @@ function checkLogin(username, password) {
     console.log(`🔐 Checking login for: ${username}`);
     
     // Get Users sheet
-    const sheet = getSheetByName('Users');
+    const sheet = getSheetByName(SHEET_NAMES.USERS);
     const data = sheet.getDataRange().getValues();
     
     if (data.length <= 1) {
@@ -276,12 +288,12 @@ function initializeSheet(sheet, sheetName) {
  */
 function getHeadersForSheet(sheetName) {
   const headerMap = {
-    'Giao dịch': ['ID', 'Ngày', 'Loại', 'Danh mục', 'Số tiền', 'Tài khoản', 'Ghi chú', 'Trạng thái'],
-    'Tài khoản': ['ID', 'Tên tài khoản', 'Loại', 'Số dư', 'Ngày tạo'],
-    'Danh mục': ['ID', 'Tên danh mục', 'Loại', 'Mô tả'],
-    'Khách hàng': ['ID', 'Tên', 'Điện thoại', 'Email', 'Địa chỉ', 'Ngày tạo'],
-    'Nhà cung cấp': ['ID', 'Tên', 'Điện thoại', 'Email', 'Địa chỉ', 'Ngày tạo'],
-    'Users': ['ID', 'Username', 'Email', 'FullName', 'RoleID', 'CreatedDate', 'Password', 'Status']
+    [SHEET_NAMES.TRANSACTIONS]: ['ID', 'Ngày', 'Loại', 'Danh mục', 'Số tiền', 'Tài khoản', 'Ghi chú', 'Trạng thái'],
+    [SHEET_NAMES.ACCOUNTS]: ['ID', 'Tên tài khoản', 'Loại', 'Số dư', 'Ngày tạo'],
+    [SHEET_NAMES.CATEGORIES]: ['ID', 'Tên danh mục', 'Loại', 'Mô tả'],
+    [SHEET_NAMES.CUSTOMERS]: ['ID', 'Tên', 'Điện thoại', 'Email', 'Địa chỉ', 'Ngày tạo'],
+    [SHEET_NAMES.SUPPLIERS]: ['ID', 'Tên', 'Điện thoại', 'Email', 'Địa chỉ', 'Ngày tạo'],
+    [SHEET_NAMES.USERS]: ['ID', 'Username', 'Email', 'FullName', 'RoleID', 'Password', 'Status', 'CreatedDate']
   };
   
   return headerMap[sheetName] || [];
@@ -330,27 +342,27 @@ function generateStructuredId(prefix, sheetName, idColumn = 0) {
 
 // ID generators for different entities
 function generateTransactionId() {
-  return generateStructuredId('GD', 'Giao dịch');
+  return generateStructuredId('GD', SHEET_NAMES.TRANSACTIONS);
 }
 
 function generateAccountId() {
-  return generateStructuredId('TK', 'Tài khoản');
+  return generateStructuredId('TK', SHEET_NAMES.ACCOUNTS);
 }
 
 function generateCategoryId() {
-  return generateStructuredId('DM', 'Danh mục');
+  return generateStructuredId('DM', SHEET_NAMES.CATEGORIES);
 }
 
 function generateCustomerId() {
-  return generateStructuredId('KH', 'Khách hàng');
+  return generateStructuredId('KH', SHEET_NAMES.CUSTOMERS);
 }
 
 function generateSupplierId() {
-  return generateStructuredId('NCC', 'Nhà cung cấp');
+  return generateStructuredId('NCC', SHEET_NAMES.SUPPLIERS);
 }
 
 function generateUserId() {
-  return generateStructuredId('USER', 'Users');
+  return generateStructuredId('USER', SHEET_NAMES.USERS);
 }
 
 // =================== UTILITY FUNCTIONS ===================
@@ -402,7 +414,7 @@ function handleApiError(error) {
  */
 function getTransactions() {
   try {
-    const sheet = getSheetByName('Giao dịch');
+    const sheet = getSheetByName(SHEET_NAMES.TRANSACTIONS);
     const data = sheet.getDataRange().getValues();
     
     if (data.length <= 1) return [];
@@ -428,7 +440,7 @@ function getTransactions() {
  */
 function addTransaction(transaction) {
   try {
-    const sheet = getSheetByName('Giao dịch');
+    const sheet = getSheetByName(SHEET_NAMES.TRANSACTIONS);
     const id = generateTransactionId();
     const timestamp = getCurrentDate();
     
@@ -456,7 +468,7 @@ function addTransaction(transaction) {
  */
 function updateTransaction(transaction) {
   try {
-    const sheet = getSheetByName('Giao dịch');
+    const sheet = getSheetByName(SHEET_NAMES.TRANSACTIONS);
     const data = sheet.getDataRange().getValues();
     
     for (let i = 1; i < data.length; i++) {
@@ -488,7 +500,7 @@ function updateTransaction(transaction) {
  */
 function deleteTransaction(transactionId) {
   try {
-    const sheet = getSheetByName('Giao dịch');
+    const sheet = getSheetByName(SHEET_NAMES.TRANSACTIONS);
     const data = sheet.getDataRange().getValues();
     
     for (let i = 1; i < data.length; i++) {
@@ -513,7 +525,7 @@ function deleteTransaction(transactionId) {
  */
 function getAccounts() {
   try {
-    const sheet = getSheetByName('Tài khoản');
+    const sheet = getSheetByName(SHEET_NAMES.ACCOUNTS);
     const data = sheet.getDataRange().getValues();
     
     if (data.length <= 1) return [];
@@ -536,7 +548,7 @@ function getAccounts() {
  */
 function addAccount(account) {
   try {
-    const sheet = getSheetByName('Tài khoản');
+    const sheet = getSheetByName(SHEET_NAMES.ACCOUNTS);
     const id = generateAccountId();
     const timestamp = getCurrentDate();
     
@@ -563,7 +575,7 @@ function addAccount(account) {
  */
 function getCategories() {
   try {
-    const sheet = getSheetByName('Danh mục');
+    const sheet = getSheetByName(SHEET_NAMES.CATEGORIES);
     const data = sheet.getDataRange().getValues();
     
     if (data.length <= 1) return [];
@@ -585,7 +597,7 @@ function getCategories() {
  */
 function addCategory(category) {
   try {
-    const sheet = getSheetByName('Danh mục');
+    const sheet = getSheetByName(SHEET_NAMES.CATEGORIES);
     const id = generateCategoryId();
     
     sheet.appendRow([
@@ -610,7 +622,7 @@ function addCategory(category) {
  */
 function getCustomers() {
   try {
-    const sheet = getSheetByName('Khách hàng');
+    const sheet = getSheetByName(SHEET_NAMES.CUSTOMERS);
     const data = sheet.getDataRange().getValues();
     
     if (data.length <= 1) return [];
@@ -634,7 +646,7 @@ function getCustomers() {
  */
 function addCustomer(customer) {
   try {
-    const sheet = getSheetByName('Khách hàng');
+    const sheet = getSheetByName(SHEET_NAMES.CUSTOMERS);
     const id = generateCustomerId();
     const timestamp = getCurrentDate();
     
@@ -662,7 +674,7 @@ function addCustomer(customer) {
  */
 function getSuppliers() {
   try {
-    const sheet = getSheetByName('Nhà cung cấp');
+    const sheet = getSheetByName(SHEET_NAMES.SUPPLIERS);
     const data = sheet.getDataRange().getValues();
     
     if (data.length <= 1) return [];
@@ -686,7 +698,7 @@ function getSuppliers() {
  */
 function addSupplier(supplier) {
   try {
-    const sheet = getSheetByName('Nhà cung cấp');
+    const sheet = getSheetByName(SHEET_NAMES.SUPPLIERS);
     const id = generateSupplierId();
     const timestamp = getCurrentDate();
     
@@ -802,7 +814,7 @@ function testSystem() {
     
     // Test sheet access
     try {
-      const usersSheet = getSheetByName('Users');
+      const usersSheet = getSheetByName(SHEET_NAMES.USERS);
       tests.sheets = true;
       console.log('✅ Sheet access: OK');
     } catch (error) {
@@ -849,7 +861,7 @@ function getSystemInfo() {
       timezone: ss.getSpreadsheetTimeZone(),
       locale: ss.getSpreadsheetLocale(),
       sheetCount: ss.getSheets().length,
-      version: '2.0.0 - Simple Login'
+      version: '2.0.0 - Fixed Sheet Names'
     };
   } catch (error) {
     console.error('Error getting system info:', error);
@@ -857,9 +869,29 @@ function getSystemInfo() {
   }
 }
 
+/**
+ * DEBUG: Get all sheet names in the spreadsheet
+ */
+function getAllSheetNames() {
+  try {
+    const ss = getSpreadsheet();
+    const sheets = ss.getSheets();
+    const sheetNames = sheets.map(sheet => sheet.getName());
+    
+    console.log('📋 All sheet names in spreadsheet:', sheetNames);
+    return {
+      success: true,
+      sheetNames: sheetNames,
+      count: sheetNames.length
+    };
+  } catch (error) {
+    console.error('Error getting sheet names:', error);
+    return handleApiError(error);
+  }
+}
 
 // =================== END OF FILE ===================
 
-console.log('✅ NHT_Code.gs loaded successfully with Simple Login system!');
-console.log('🔐 Main functions: checkLogin(), getAllData()');
-console.log('📊 Ready for production use with Google Sheets database');
+console.log('✅ NHT_Code.gs loaded successfully with FIXED SHEET NAMES!');
+console.log('🔧 Remember to update SHEET_NAMES constant with your actual sheet names');
+console.log('📋 Use getAllSheetNames() to see all sheets in your spreadsheet');
