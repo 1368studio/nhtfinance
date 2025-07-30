@@ -1,4 +1,4 @@
-<!-- JavaScript.html - UPDATED WITH SIMPLE LOGIN -->
+<!-- JavaScript.html - UPDATED FOR YOUR EXCEL STRUCTURE -->
 <script>
 // =================== GLOBAL VARIABLES ===================
 let currentUser = null;
@@ -128,16 +128,23 @@ function loadAppData() {
       customers = data.customers || [];
       suppliers = data.suppliers || [];
       
+      console.log('📊 Data loaded:');
+      console.log('- Transactions:', transactions.length);
+      console.log('- Accounts:', accounts.length);
+      console.log('- Categories:', categories.length);
+      console.log('- Customers:', customers.length);
+      console.log('- Suppliers:', suppliers.length);
+      
       // Update UI
       updateDashboardStats();
       displayRecentTransactions();
       populateDropdowns();
       
-      console.log('✅ App data loaded');
+      console.log('✅ App data loaded successfully');
     })
     .withFailureHandler(function(error) {
       hideLoading();
-      showNotification('Không thể tải dữ liệu', 'error');
+      showNotification('Không thể tải dữ liệu: ' + error.message, 'error');
       console.error('Load data error:', error);
     })
     .getAllData();
@@ -300,23 +307,43 @@ function loadPageData(pageId) {
   }
 }
 
-// =================== DASHBOARD FUNCTIONS ===================
+// =================== DASHBOARD FUNCTIONS - FIXED FOR YOUR DATA ===================
 function updateDashboardStats() {
+  console.log('📊 Updating dashboard stats...');
+  console.log('Transactions data:', transactions);
+  console.log('Accounts data:', accounts);
+  
+  // Tính tổng thu nhập (Doanh thu)
   const totalIncome = transactions
-    .filter(t => t.type === 'Thu')
+    .filter(t => t.type === 'Doanh thu' || t.type === 'Thu')
     .reduce((sum, t) => sum + (parseFloat(t.amount) || 0), 0);
   
+  // Tính tổng chi phí (Chi phí)
   const totalExpense = transactions
-    .filter(t => t.type === 'Chi')
+    .filter(t => t.type === 'Chi phí' || t.type === 'Chi')
     .reduce((sum, t) => sum + (parseFloat(t.amount) || 0), 0);
   
   const netProfit = totalIncome - totalExpense;
+  
+  // Tính tổng số dư từ "Số dư hiện tại" của accounts
   const totalBalance = accounts.reduce((sum, acc) => sum + (parseFloat(acc.balance) || 0), 0);
+  
+  console.log('💰 Stats calculated:');
+  console.log('- Total Income:', totalIncome);
+  console.log('- Total Expense:', totalExpense);
+  console.log('- Net Profit:', netProfit);
+  console.log('- Total Balance:', totalBalance);
   
   updateElement('total-income', formatCurrency(totalIncome));
   updateElement('total-expense', formatCurrency(totalExpense));
   updateElement('net-profit', formatCurrency(netProfit));
   updateElement('total-balance', formatCurrency(totalBalance));
+  
+  // Update profit color
+  const profitElement = document.getElementById('net-profit');
+  if (profitElement) {
+    profitElement.className = netProfit >= 0 ? 'stat-value income' : 'stat-value expense';
+  }
 }
 
 function displayRecentTransactions() {
@@ -330,23 +357,24 @@ function displayRecentTransactions() {
     return;
   }
   
+  // Lấy 5 giao dịch gần nhất
   const recent = transactions.slice(0, 5);
   recent.forEach(transaction => {
     const row = document.createElement('tr');
-    const amountClass = transaction.type === 'Thu' ? 'income' : 'expense';
+    const amountClass = (transaction.type === 'Doanh thu' || transaction.type === 'Thu') ? 'income' : 'expense';
     
     row.innerHTML = `
       <td>${formatDate(transaction.date)}</td>
-      <td><span class="badge ${transaction.type === 'Thu' ? 'badge-success' : 'badge-danger'}">${transaction.type}</span></td>
+      <td><span class="badge ${(transaction.type === 'Doanh thu' || transaction.type === 'Thu') ? 'badge-success' : 'badge-danger'}">${transaction.type}</span></td>
       <td class="${amountClass}">${formatCurrency(transaction.amount)}</td>
-      <td>${transaction.account}</td>
+      <td>${transaction.account || '-'}</td>
       <td>${transaction.note || '-'}</td>
     `;
     tbody.appendChild(row);
   });
 }
 
-// =================== TRANSACTION FUNCTIONS ===================
+// =================== TRANSACTION FUNCTIONS - FIXED FOR YOUR DATA ===================
 function displayTransactions() {
   const tbody = document.getElementById('transactions-table-body');
   if (!tbody) return;
@@ -360,18 +388,18 @@ function displayTransactions() {
   
   transactions.forEach(transaction => {
     const row = document.createElement('tr');
-    const amountClass = transaction.type === 'Thu' ? 'income' : 'expense';
+    const amountClass = (transaction.type === 'Doanh thu' || transaction.type === 'Thu') ? 'income' : 'expense';
     
     row.innerHTML = `
       <td><input type="checkbox"></td>
       <td>${transaction.id}</td>
       <td>${formatDate(transaction.date)}</td>
-      <td><span class="badge ${transaction.type === 'Thu' ? 'badge-success' : 'badge-danger'}">${transaction.type}</span></td>
-      <td>${transaction.category}</td>
+      <td><span class="badge ${(transaction.type === 'Doanh thu' || transaction.type === 'Thu') ? 'badge-success' : 'badge-danger'}">${transaction.type}</span></td>
+      <td>${transaction.category || '-'}</td>
       <td class="${amountClass}">${formatCurrency(transaction.amount)}</td>
-      <td>${transaction.account}</td>
+      <td>${transaction.account || '-'}</td>
       <td>${transaction.note || '-'}</td>
-      <td><span class="status-completed">Hoàn thành</span></td>
+      <td><span class="status-${transaction.status === 'Đã thanh toán' ? 'completed' : 'pending'}">${transaction.status || 'Chưa thanh toán'}</span></td>
       <td>
         <button class="btn btn-sm btn-secondary" onclick="editTransaction('${transaction.id}')" title="Sửa">
           <i class="fas fa-edit"></i>
@@ -445,7 +473,7 @@ function handleTransactionSubmit(event) {
     .addTransaction(formData);
 }
 
-// =================== DISPLAY FUNCTIONS ===================
+// =================== DISPLAY FUNCTIONS - FIXED FOR YOUR DATA ===================
 function displayAccounts() {
   const accountsList = document.getElementById('accounts-list');
   if (!accountsList) return;
@@ -463,11 +491,11 @@ function displayAccounts() {
         <div class="stat-header">
           <div class="stat-title">${account.name}</div>
           <div class="stat-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
-            <i class="fas fa-wallet"></i>
+            ${account.icon || '<i class="fas fa-wallet"></i>'}
           </div>
         </div>
         <div class="stat-value ${balanceClass}">${formatCurrency(account.balance || 0)}</div>
-        <div class="stat-change">${account.type}</div>
+        <div class="stat-change">${account.type} ${account.accountNumber ? '• ' + account.accountNumber : ''}</div>
       </div>
     `;
   });
@@ -491,8 +519,8 @@ function displayCategories() {
     const row = document.createElement('tr');
     row.innerHTML = `
       <td>${category.id}</td>
-      <td>${category.name}</td>
-      <td><span class="badge ${category.type === 'Thu' ? 'badge-success' : 'badge-danger'}">${category.type}</span></td>
+      <td>${category.icon || '📁'} ${category.name}</td>
+      <td><span class="badge ${category.type === 'Doanh thu' ? 'badge-success' : 'badge-danger'}">${category.type}</span></td>
       <td>${category.description || '-'}</td>
       <td>
         <button class="btn btn-sm btn-secondary" onclick="editCategory('${category.id}')" title="Sửa">
@@ -574,7 +602,7 @@ function displaySuppliers() {
 }
 
 function populateDropdowns() {
-  // Account dropdown
+  // Account dropdown - sử dụng tên từ cấu trúc mới
   const accountSelect = document.getElementById('transaction-source-account');
   if (accountSelect) {
     accountSelect.innerHTML = '<option value="">-- Chọn tài khoản --</option>';
@@ -586,16 +614,26 @@ function populateDropdowns() {
     });
   }
   
-  // Category dropdown
+  // Category dropdown - sử dụng tên từ cấu trúc mới
   const categorySelect = document.getElementById('transaction-category');
   if (categorySelect) {
     categorySelect.innerHTML = '<option value="">-- Chọn danh mục --</option>';
     categories.forEach(category => {
       const option = document.createElement('option');
       option.value = category.name;
-      option.textContent = category.name;
+      option.textContent = `${category.icon || '📁'} ${category.name}`;
       categorySelect.appendChild(option);
     });
+  }
+  
+  // Update transaction type options to match your data
+  const typeSelect = document.getElementById('transaction-type');
+  if (typeSelect) {
+    typeSelect.innerHTML = `
+      <option value="">-- Chọn loại --</option>
+      <option value="Doanh thu">Doanh thu</option>
+      <option value="Chi phí">Chi phí</option>
+    `;
   }
 }
 
@@ -645,8 +683,13 @@ function formatCurrency(amount) {
 function formatDate(dateStr) {
   if (!dateStr) return '';
   
-  const date = new Date(dateStr);
-  return date.toLocaleDateString('vi-VN');
+  try {
+    const date = new Date(dateStr);
+    if (isNaN(date.getTime())) return dateStr; // Return original if invalid date
+    return date.toLocaleDateString('vi-VN');
+  } catch (error) {
+    return dateStr;
+  }
 }
 
 // =================== PLACEHOLDER FUNCTIONS ===================
@@ -794,6 +837,16 @@ function initializeEventListeners() {
     transactionForm.addEventListener('submit', handleTransactionSubmit);
   }
   
+  // Dashboard refresh button
+  const refreshBtn = document.getElementById('refresh-dashboard');
+  if (refreshBtn) {
+    refreshBtn.addEventListener('click', function() {
+      if (requireLogin()) {
+        loadAppData();
+      }
+    });
+  }
+  
   console.log('✅ Event listeners set up');
 }
 
@@ -827,7 +880,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   }, 100);
   
-  console.log('✅ NHT Finance System Ready!');
+  console.log('✅ NHT Finance System Ready - Fixed for your Excel structure!');
 });
 
 // =================== DEBUGGING UTILITIES ===================
@@ -851,9 +904,12 @@ window.NHTFinance = {
       console.log('=== NHT Finance Debug Info ===');
       console.log('Current User:', currentUser);
       console.log('Current Page:', currentPage);
-      console.log('Transactions:', transactions);
-      console.log('Accounts:', accounts);
-      console.log('Categories:', categories);
+      console.log('📊 Data Summary:');
+      console.log('- Transactions:', transactions.length, transactions);
+      console.log('- Accounts:', accounts.length, accounts);
+      console.log('- Categories:', categories.length, categories);
+      console.log('- Customers:', customers.length, customers);
+      console.log('- Suppliers:', suppliers.length, suppliers);
     },
     testNotification: (message, type) => {
       showNotification(message || 'Test notification', type || 'info');
@@ -864,11 +920,31 @@ window.NHTFinance = {
       } else {
         console.log('Not logged in');
       }
+    },
+    testDataStructure: () => {
+      console.log('🔍 Testing data structure...');
+      if (transactions.length > 0) {
+        console.log('📊 Sample transaction:', transactions[0]);
+        console.log('📊 Transaction fields:', Object.keys(transactions[0]));
+      }
+      if (accounts.length > 0) {
+        console.log('💰 Sample account:', accounts[0]);
+        console.log('💰 Account fields:', Object.keys(accounts[0]));
+      }
+      if (categories.length > 0) {
+        console.log('📁 Sample category:', categories[0]);
+        console.log('📁 Category fields:', Object.keys(categories[0]));
+      }
     }
   }
 };
 
-console.log('🎉 NHT Finance System JavaScript loaded with Simple Login!');
+console.log('🎉 NHT Finance System JavaScript loaded - FIXED FOR YOUR EXCEL STRUCTURE!');
 console.log('🧪 Use NHTFinance.debug.testLogin() to test login quickly');
 console.log('📋 Use NHTFinance.debug.showData() to view current data');
+console.log('🔍 Use NHTFinance.debug.testDataStructure() to check data structure');
+console.log('📊 Key changes:');
+console.log('- Fixed transaction types: "Doanh thu" and "Chi phí"');
+console.log('- Fixed account balance field');
+console.log('- Updated data mapping for all entities');
 </script>
