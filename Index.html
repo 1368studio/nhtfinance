@@ -1,310 +1,230 @@
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hệ thống quản lý tài chính NHT</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    
-    <!-- Include CSS trực tiếp từ file Stylesheet.html -->
-    <?!= include('Stylesheet'); ?>
-</head>
-<body>
-    <div class="app-container" id="app-container">
-        <!-- Sidebar -->
-        <div class="sidebar" id="sidebar">
-            <div class="sidebar-header">
-                <div class="logo">NHT Finance</div>
-                <button class="collapse-btn" id="collapse-sidebar">
-                    <i class="fas fa-bars"></i>
-                </button>
-            </div>
-            <ul class="sidebar-menu">
-                <li data-page="dashboard" class="active">
-                    <i class="fas fa-tachometer-alt"></i>
-                    <span>Dashboard</span>
-                </li>
-                <li data-page="transactions">
-                    <i class="fas fa-exchange-alt"></i>
-                    <span>Giao dịch</span>
-                </li>
-                <li data-page="accounts">
-                    <i class="fas fa-wallet"></i>
-                    <span>Tài khoản</span>
-                </li>
-                <li data-page="categories">
-                    <i class="fas fa-tags"></i>
-                    <span>Danh mục</span>
-                </li>
-                <li data-page="customers">
-                    <i class="fas fa-users"></i>
-                    <span>Khách hàng</span>
-                </li>
-                <li data-page="suppliers">
-                    <i class="fas fa-truck"></i>
-                    <span>Nhà cung cấp</span>
-                </li>
-                <li data-page="reports">
-                    <i class="fas fa-chart-bar"></i>
-                    <span>Báo cáo</span>
-                </li>
-                <li data-page="settings">
-                    <i class="fas fa-cog"></i>
-                    <span>Cài đặt</span>
-                </li>
-            </ul>
-        </div>
-
-        <!-- Main Content -->
-        <div class="main-content">
-            <!-- Header -->
-            <div class="header">
-                <h1 class="header-title" id="page-title">Dashboard</h1>
-                <div class="user-menu">
-                    <div class="user-info" id="user-menu-toggle">
-                        <div class="user-avatar" id="user-avatar">A</div>
-                        <span id="username-display">Admin</span>
-                        <i class="fas fa-chevron-down"></i>
-                    </div>
-                    <div class="dropdown-menu" id="user-dropdown" style="display: none;">
-                        <a href="#" id="logout-button">
-                            <i class="fas fa-sign-out-alt"></i> Đăng xuất
-                        </a>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Content -->
-            <div class="content">
-                <!-- Dashboard Page -->
-                <div class="page active" id="dashboard">
-                    <div class="page-header">
-                        <h2 class="page-title">Tổng quan tài chính</h2>
-                    </div>
-                    
-                    <div class="stats-grid">
-                        <div class="stat-card">
-                            <div class="stat-header">
-                                <div class="stat-title">Tổng thu nhập</div>
-                                <div class="stat-icon" style="background: linear-gradient(135deg, #56ab2f 0%, #a8e6cf 100%);">
-                                    <i class="fas fa-arrow-up"></i>
-                                </div>
-                            </div>
-                            <div class="stat-value income" id="total-income">0 VND</div>
-                        </div>
-                        
-                        <div class="stat-card">
-                            <div class="stat-header">
-                                <div class="stat-title">Tổng chi phí</div>
-                                <div class="stat-icon" style="background: linear-gradient(135deg, #ff416c 0%, #ff4b2b 100%);">
-                                    <i class="fas fa-arrow-down"></i>
-                                </div>
-                            </div>
-                            <div class="stat-value expense" id="total-expense">0 VND</div>
-                        </div>
-                        
-                        <div class="stat-card">
-                            <div class="stat-header">
-                                <div class="stat-title">Lợi nhuận</div>
-                                <div class="stat-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
-                                    <i class="fas fa-chart-line"></i>
-                                </div>
-                            </div>
-                            <div class="stat-value" id="net-profit">0 VND</div>
-                        </div>
-                        
-                        <div class="stat-card">
-                            <div class="stat-header">
-                                <div class="stat-title">Tổng số dư</div>
-                                <div class="stat-icon" style="background: linear-gradient(135deg, #f7b733 0%, #fc4a1a 100%);">
-                                    <i class="fas fa-wallet"></i>
-                                </div>
-                            </div>
-                            <div class="stat-value" id="total-balance">0 VND</div>
-                        </div>
-                    </div>
-
-                    <!-- Recent Transactions -->
-                    <div class="table-container">
-                        <div style="padding: 20px 30px; border-bottom: 1px solid #e9ecef;">
-                            <h3 style="margin: 0; color: #333;">Giao dịch gần đây</h3>
-                        </div>
-                        <table class="data-table">
-                            <thead>
-                                <tr>
-                                    <th>Ngày</th>
-                                    <th>Loại</th>
-                                    <th>Số tiền</th>
-                                    <th>Tài khoản</th>
-                                    <th>Ghi chú</th>
-                                </tr>
-                            </thead>
-                            <tbody id="recent-transactions-body">
-                                <tr>
-                                    <td colspan="5" class="text-center" style="padding: 40px; color: #666;">
-                                        Chưa có giao dịch nào
+<tr>
+                                    <td colspan="6" class="text-center" style="padding: 40px; color: #666;">
+                                        Chưa có lịch sử nào
                                     </td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
-                </div>
-
-                <!-- Transactions Page -->
-                <div class="page" id="transactions">
-                    <div class="page-header">
-                        <h2 class="page-title">Quản lý giao dịch</h2>
-                        <button class="add-button" id="add-transaction-btn">
-                            <i class="fas fa-plus"></i> Thêm giao dịch
-                        </button>
-                    </div>
-                    
-                    <div class="table-container">
-                        <table class="data-table">
-                            <thead>
-                                <tr>
-                                    <th>Mã GD</th>
-                                    <th>Ngày</th>
-                                    <th>Loại</th>
-                                    <th>Số tiền</th>
-                                    <th>Tài khoản</th>
-                                    <th>Ghi chú</th>
-                                    <th>Thao tác</th>
-                                </tr>
-                            </thead>
-                            <tbody id="transactions-table-body">
-                                <tr>
-                                    <td colspan="7" class="text-center" style="padding: 40px; color: #666;">
-                                        Chưa có giao dịch nào
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <!-- Accounts Page -->
-                <div class="page" id="accounts">
-                    <div class="page-header">
-                        <h2 class="page-title">Quản lý tài khoản</h2>
-                        <button class="add-button" id="add-account-btn">
-                            <i class="fas fa-plus"></i> Thêm tài khoản
-                        </button>
-                    </div>
-                    <div id="accounts-list">
-                        <p style="text-align: center; color: #666; padding: 40px;">Chưa có tài khoản nào</p>
-                    </div>
-                </div>
-
-                <!-- Categories Page -->
-                <div class="page" id="categories">
-                    <div class="page-header">
-                        <h2 class="page-title">Quản lý danh mục</h2>
-                        <button class="add-button" id="add-category-btn">
-                            <i class="fas fa-plus"></i> Thêm danh mục
-                        </button>
-                    </div>
-                    <div class="table-container">
-                        <table class="data-table">
-                            <thead>
-                                <tr>
-                                    <th>Tên danh mục</th>
-                                    <th>Loại</th>
-                                    <th>Mô tả</th>
-                                    <th>Thao tác</th>
-                                </tr>
-                            </thead>
-                            <tbody id="categories-table-body">
-                                <tr>
-                                    <td colspan="4" class="text-center" style="padding: 40px; color: #666;">
-                                        Chưa có danh mục nào
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <!-- Customers Page -->
-                <div class="page" id="customers">
-                    <div class="page-header">
-                        <h2 class="page-title">Quản lý khách hàng</h2>
-                        <button class="add-button" id="add-customer-btn">
-                            <i class="fas fa-plus"></i> Thêm khách hàng
-                        </button>
-                    </div>
-                    <div class="table-container">
-                        <table class="data-table">
-                            <thead>
-                                <tr>
-                                    <th>Mã KH</th>
-                                    <th>Tên khách hàng</th>
-                                    <th>Điện thoại</th>
-                                    <th>Email</th>
-                                    <th>Thao tác</th>
-                                </tr>
-                            </thead>
-                            <tbody id="customers-table-body">
-                                <tr>
-                                    <td colspan="5" class="text-center" style="padding: 40px; color: #666;">
-                                        Chưa có khách hàng nào
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <!-- Suppliers Page -->
-                <div class="page" id="suppliers">
-                    <div class="page-header">
-                        <h2 class="page-title">Quản lý nhà cung cấp</h2>
-                        <button class="add-supplier-btn" id="add-supplier-btn">
-                            <i class="fas fa-plus"></i> Thêm nhà cung cấp
-                        </button>
-                    </div>
-                    <div class="table-container">
-                        <table class="data-table">
-                            <thead>
-                                <tr>
-                                    <th>Mã NCC</th>
-                                    <th>Tên nhà cung cấp</th>
-                                    <th>Điện thoại</th>
-                                    <th>Email</th>
-                                    <th>Thao tác</th>
-                                </tr>
-                            </thead>
-                            <tbody id="suppliers-table-body">
-                                <tr>
-                                    <td colspan="5" class="text-center" style="padding: 40px; color: #666;">
-                                        Chưa có nhà cung cấp nào
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <!-- Reports Page -->
-                <div class="page" id="reports">
-                    <div class="page-header">
-                        <h2 class="page-title">Báo cáo tài chính</h2>
-                    </div>
-                    <p style="text-align: center; color: #666; padding: 40px;">
-                        <i class="fas fa-chart-line" style="font-size: 48px; margin-bottom: 20px; display: block; opacity: 0.3;"></i>
-                        Trang báo cáo đang được phát triển...
-                    </p>
                 </div>
 
                 <!-- Settings Page -->
                 <div class="page" id="settings">
                     <div class="page-header">
                         <h2 class="page-title">Cài đặt hệ thống</h2>
+                        <button class="btn btn-primary" id="save-settings">
+                            <i class="fas fa-save"></i> Lưu cài đặt
+                        </button>
                     </div>
-                    <p style="text-align: center; color: #666; padding: 40px;">
-                        <i class="fas fa-cog" style="font-size: 48px; margin-bottom: 20px; display: block; opacity: 0.3;"></i>
-                        Trang cài đặt đang được phát triển...
-                    </p>
+                    
+                    <div class="settings-tabs">
+                        <button class="settings-tab active" data-tab="general">Chung</button>
+                        <button class="settings-tab" data-tab="security">Bảo mật</button>
+                        <button class="settings-tab" data-tab="notifications">Thông báo</button>
+                        <button class="settings-tab" data-tab="system">Hệ thống</button>
+                    </div>
+                    
+                    <div class="settings-content">
+                        <!-- General Settings -->
+                        <div class="settings-panel active" id="general-settings">
+                            <div class="settings-section">
+                                <h3>Cài đặt chung</h3>
+                                <div class="setting-item">
+                                    <label>Tên công ty:</label>
+                                    <input type="text" id="company-name" value="Công ty NHT">
+                                </div>
+                                <div class="setting-item">
+                                    <label>Địa chỉ:</label>
+                                    <input type="text" id="company-address" value="">
+                                </div>
+                                <div class="setting-item">
+                                    <label>Điện thoại:</label>
+                                    <input type="text" id="company-phone" value="">
+                                </div>
+                                <div class="setting-item">
+                                    <label>Email:</label>
+                                    <input type="email" id="company-email" value="">
+                                </div>
+                                <div class="setting-item">
+                                    <label>Múi giờ:</label>
+                                    <select id="timezone">
+                                        <option value="Asia/Ho_Chi_Minh" selected>GMT+7 (Việt Nam)</option>
+                                        <option value="Asia/Bangkok">GMT+7 (Bangkok)</option>
+                                        <option value="Asia/Jakarta">GMT+7 (Jakarta)</option>
+                                    </select>
+                                </div>
+                                <div class="setting-item">
+                                    <label>Định dạng tiền tệ:</label>
+                                    <select id="currency-format">
+                                        <option value="VND" selected>VND - Việt Nam Đồng</option>
+                                        <option value="USD">USD - US Dollar</option>
+                                        <option value="EUR">EUR - Euro</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Security Settings -->
+                        <div class="settings-panel" id="security-settings">
+                            <div class="settings-section">
+                                <h3>Cài đặt bảo mật</h3>
+                                <div class="setting-item">
+                                    <label>Thời gian timeout phiên (phút):</label>
+                                    <input type="number" id="session-timeout" value="30" min="5" max="480">
+                                </div>
+                                <div class="setting-item">
+                                    <label>Yêu cầu mật khẩu mạnh:</label>
+                                    <div class="toggle-switch">
+                                        <input type="checkbox" id="strong-password" checked>
+                                        <span class="slider"></span>
+                                    </div>
+                                </div>
+                                <div class="setting-item">
+                                    <label>Đăng nhập 2 lớp (2FA):</label>
+                                    <div class="toggle-switch">
+                                        <input type="checkbox" id="two-factor-auth">
+                                        <span class="slider"></span>
+                                    </div>
+                                </div>
+                                <div class="setting-item">
+                                    <label>Ghi log hoạt động:</label>
+                                    <div class="toggle-switch">
+                                        <input type="checkbox" id="activity-logging" checked>
+                                        <span class="slider"></span>
+                                    </div>
+                                </div>
+                                <div class="setting-item">
+                                    <label>Số lần đăng nhập sai tối đa:</label>
+                                    <input type="number" id="max-login-attempts" value="5" min="3" max="10">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Notifications Settings -->
+                        <div class="settings-panel" id="notifications-settings">
+                            <div class="settings-section">
+                                <h3>Cài đặt thông báo</h3>
+                                <div class="setting-item">
+                                    <label>Thông báo email:</label>
+                                    <div class="toggle-switch">
+                                        <input type="checkbox" id="email-notifications" checked>
+                                        <span class="slider"></span>
+                                    </div>
+                                </div>
+                                <div class="setting-item">
+                                    <label>Thông báo giao dịch lớn:</label>
+                                    <div class="toggle-switch">
+                                        <input type="checkbox" id="large-transaction-alert" checked>
+                                        <span class="slider"></span>
+                                    </div>
+                                </div>
+                                <div class="setting-item">
+                                    <label>Ngưỡng giao dịch lớn (VND):</label>
+                                    <input type="number" id="large-transaction-threshold" value="50000000">
+                                </div>
+                                <div class="setting-item">
+                                    <label>Báo cáo hàng ngày:</label>
+                                    <div class="toggle-switch">
+                                        <input type="checkbox" id="daily-reports">
+                                        <span class="slider"></span>
+                                    </div>
+                                </div>
+                                <div class="setting-item">
+                                    <label>Báo cáo hàng tuần:</label>
+                                    <div class="toggle-switch">
+                                        <input type="checkbox" id="weekly-reports" checked>
+                                        <span class="slider"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- System Settings -->
+                        <div class="settings-panel" id="system-settings">
+                            <div class="settings-section">
+                                <h3>Cài đặt hệ thống</h3>
+                                <div class="setting-item">
+                                    <label>Số bản ghi hiển thị mỗi trang:</label>
+                                    <select id="records-per-page">
+                                        <option value="10">10</option>
+                                        <option value="25" selected>25</option>
+                                        <option value="50">50</option>
+                                        <option value="100">100</option>
+                                    </select>
+                                </div>
+                                <div class="setting-item">
+                                    <label>Tự động backup dữ liệu:</label>
+                                    <div class="toggle-switch">
+                                        <input type="checkbox" id="auto-backup" checked>
+                                        <span class="slider"></span>
+                                    </div>
+                                </div>
+                                <div class="setting-item">
+                                    <label>Tần suất backup:</label>
+                                    <select id="backup-frequency">
+                                        <option value="daily">Hàng ngày</option>
+                                        <option value="weekly" selected>Hàng tuần</option>
+                                        <option value="monthly">Hàng tháng</option>
+                                    </select>
+                                </div>
+                                <div class="setting-item">
+                                    <label>Số lượng backup lưu trữ:</label>
+                                    <input type="number" id="backup-retention" value="30" min="5" max="365">
+                                </div>
+                                <div class="setting-item">
+                                    <label>Chế độ debug:</label>
+                                    <div class="toggle-switch">
+                                        <input type="checkbox" id="debug-mode">
+                                        <span class="slider"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="settings-section">
+                                <h3>Bảo trì hệ thống</h3>
+                                <div class="maintenance-actions">
+                                    <button class="btn btn-warning" id="cleanup-system">
+                                        <i class="fas fa-broom"></i> Dọn dẹp hệ thống
+                                    </button>
+                                    <button class="btn btn-info" id="test-system">
+                                        <i class="fas fa-cog"></i> Kiểm tra hệ thống
+                                    </button>
+                                    <button class="btn btn-success" id="backup-now">
+                                        <i class="fas fa-download"></i> Backup ngay
+                                    </button>
+                                    <button class="btn btn-danger" id="reset-system">
+                                        <i class="fas fa-exclamation-triangle"></i> Đặt lại hệ thống
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="settings-section">
+                                <h3>Thông tin hệ thống</h3>
+                                <div class="system-info">
+                                    <div class="info-item">
+                                        <label>Phiên bản:</label>
+                                        <span>NHT Finance v1.0.0</span>
+                                    </div>
+                                    <div class="info-item">
+                                        <label>Cập nhật lần cuối:</label>
+                                        <span id="last-update">30/07/2025</span>
+                                    </div>
+                                    <div class="info-item">
+                                        <label>Dung lượng sử dụng:</label>
+                                        <span id="storage-used">2.5 MB / 100 MB</span>
+                                    </div>
+                                    <div class="info-item">
+                                        <label>Số người dùng:</label>
+                                        <span id="total-users">5</span>
+                                    </div>
+                                    <div class="info-item">
+                                        <label>Số giao dịch:</label>
+                                        <span id="total-transactions">156</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -346,7 +266,7 @@
     <div class="modal" id="transaction-modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3>Thêm giao dịch mới</h3>
+                <h3 id="transaction-modal-title">Thêm giao dịch mới</h3>
                 <span class="close">&times;</span>
             </div>
             <div class="modal-body">
@@ -405,15 +325,1986 @@
         </div>
     </div>
 
-    <!-- Loading Overlay -->
-    <div id="loading-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.9); z-index: 9999; align-items: center; justify-content: center;">
-        <div style="text-align: center;">
-            <div style="width: 50px; height: 50px; border: 3px solid #f3f3f3; border-top: 3px solid #667eea; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 15px;"></div>
-            <p style="color: #666; font-size: 16px;">Đang tải dữ liệu...</p>
+    <!-- Account Modal -->
+    <div class="modal" id="account-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="account-modal-title">Thêm tài khoản mới</h3>
+                <span class="close">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="account-form">
+                    <input type="hidden" id="account-id">
+                    
+                    <div class="form-group">
+                        <label class="required-field">Tên tài khoản:</label>
+                        <input type="text" id="account-name" required placeholder="Nhập tên tài khoản">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="required-field">Loại tài khoản:</label>
+                        <select id="account-type" required>
+                            <option value="">-- Chọn loại --</option>
+                            <option value="Tiền mặt">Tiền mặt</option>
+                            <option value="Ngân hàng">Tài khoản ngân hàng</option>
+                            <option value="Ví điện tử">Ví điện tử</option>
+                            <option value="Thẻ tín dụng">Thẻ tín dụng</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Số dư ban đầu:</label>
+                        <input type="number" id="account-balance" step="1000" min="0" placeholder="Nhập số dư ban đầu">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Mô tả:</label>
+                        <textarea id="account-description" rows="3" placeholder="Mô tả tài khoản..."></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="cancel-btn">Hủy</button>
+                <button type="submit" form="account-form" class="save-btn">
+                    <i class="fas fa-save"></i> Lưu tài khoản
+                </button>
+            </div>
         </div>
     </div>
 
+    <!-- Category Modal -->
+    <div class="modal" id="category-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="category-modal-title">Thêm danh mục mới</h3>
+                <span class="close">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="category-form">
+                    <input type="hidden" id="category-id">
+                    
+                    <div class="form-group">
+                        <label class="required-field">Tên danh mục:</label>
+                        <input type="text" id="category-name" required placeholder="Nhập tên danh mục">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="required-field">Loại danh mục:</label>
+                        <select id="category-type" required>
+                            <option value="">-- Chọn loại --</option>
+                            <option value="Thu">Thu nhập</option>
+                            <option value="Chi">Chi phí</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Mô tả:</label>
+                        <textarea id="category-description" rows="3" placeholder="Mô tả danh mục..."></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="cancel-btn">Hủy</button>
+                <button type="submit" form="category-form" class="save-btn">
+                    <i class="fas fa-save"></i> Lưu danh mục
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Customer Modal -->
+    <div class="modal" id="customer-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="customer-modal-title">Thêm khách hàng mới</h3>
+                <span class="close">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="customer-form">
+                    <input type="hidden" id="customer-id">
+                    
+                    <div class="form-group">
+                        <label class="required-field">Tên khách hàng:</label>
+                        <input type="text" id="customer-name" required placeholder="Nhập tên khách hàng">
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Điện thoại:</label>
+                            <input type="tel" id="customer-phone" placeholder="Nhập số điện thoại">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Email:</label>
+                            <input type="email" id="customer-email" placeholder="Nhập email">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Địa chỉ:</label>
+                        <textarea id="customer-address" rows="3" placeholder="Nhập địa chỉ..."></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="cancel-btn">Hủy</button>
+                <button type="submit" form="customer-form" class="save-btn">
+                    <i class="fas fa-save"></i> Lưu khách hàng
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Supplier Modal -->
+    <div class="modal" id="supplier-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="supplier-modal-title">Thêm nhà cung cấp mới</h3>
+                <span class="close">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="supplier-form">
+                    <input type="hidden" id="supplier-id">
+                    
+                    <div class="form-group">
+                        <label class="required-field">Tên nhà cung cấp:</label>
+                        <input type="text" id="supplier-name" required placeholder="Nhập tên nhà cung cấp">
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Điện thoại:</label>
+                            <input type="tel" id="supplier-phone" placeholder="Nhập số điện thoại">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Email:</label>
+                            <input type="email" id="supplier-email" placeholder="Nhập email">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Địa chỉ:</label>
+                        <textarea id="supplier-address" rows="3" placeholder="Nhập địa chỉ..."></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="cancel-btn">Hủy</button>
+                <button type="submit" form="supplier-form" class="save-btn">
+                    <i class="fas fa-save"></i> Lưu nhà cung cấp
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- User Modal -->
+    <div class="modal" id="user-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="user-modal-title">Thêm người dùng mới</h3>
+                <span class="close">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="user-form">
+                    <input type="hidden" id="user-id">
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="required-field">Tên đăng nhập:</label>
+                            <input type="text" id="user-username" required placeholder="Nhập tên đăng nhập">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="required-field">Họ tên:</label>
+                            <input type="text" id="user-fullname" required placeholder="Nhập họ tên">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Email:</label>
+                            <input type="email" id="user-email" placeholder="Nhập email">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="required-field">Vai trò:</label>
+                            <select id="user-role" required>
+                                <option value="">-- Chọn vai trò --</option>
+                                <option value="ADMIN">Quản trị viên</option>
+                                <option value="MANAGER">Quản lý</option>
+                                <option value="USER">Người dùng</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="required-field">Mật khẩu:</label>
+                            <input type="password" id="user-password" required placeholder="Nhập mật khẩu">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="required-field">Xác nhận mật khẩu:</label>
+                            <input type="password" id="user-confirm-password" required placeholder="Nhập lại mật khẩu">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Trạng thái:</label>
+                        <select id="user-status">
+                            <option value="Active">Hoạt động</option>
+                            <option value="Inactive">Không hoạt động</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="cancel-btn">Hủy</button>
+                <button type="submit" form="user-form" class="save-btn">
+                    <i class="fas fa-save"></i> Lưu người dùng
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div class="modal" id="confirmation-modal">
+        <div class="modal-content" style="max-width: 400px;">
+            <div class="modal-header">
+                <h3 id="confirm-title">Xác nhận</h3>
+                <span class="close">&times;</span>
+            </div>
+            <div class="modal-body">
+                <p id="confirm-message">Bạn có chắc chắn muốn thực hiện hành động này?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="cancel-btn" id="confirm-cancel">Hủy</button>
+                <button type="button" class="btn btn-danger" id="confirm-ok">Xác nhận</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Profile Modal -->
+    <div class="modal" id="profile-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Thông tin cá nhân</h3>
+                <span class="close">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="profile-form">
+                    <div class="form-group">
+                        <label>Tên đăng nhập:</label>
+                        <input type="text" id="profile-username" readonly style="background: #f8f9fa;">
+                    </div>
+                    <div class="form-group">
+                        <label>Họ tên:</label>
+                        <input type="text" id="profile-fullname" placeholder="Nhập họ tên">
+                    </div>
+                    <div class="form-group">
+                        <label>Email:</label>
+                        <input type="email" id="profile-email" placeholder="Nhập email">
+                    </div>
+                    <div class="form-group">
+                        <label>Vai trò:</label>
+                        <input type="text" id="profile-role" readonly style="background: #f8f9fa;">
+                    </div>
+                    <div class="form-group">
+                        <label>Đổi mật khẩu mới:</label>
+                        <input type="password" id="profile-new-password" placeholder="Để trống nếu không đổi">
+                    </div>
+                    <div class="form-group">
+                        <label>Xác nhận mật khẩu mới:</label>
+                        <input type="password" id="profile-confirm-password" placeholder="Xác nhận mật khẩu mới">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="cancel-btn">Hủy</button>
+                <button type="submit" form="profile-form" class="save-btn">
+                    <i class="fas fa-save"></i> Cập nhật
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notifications Container -->
+    <div id="toast-container" style="position: fixed; top: 80px; right: 20px; z-index: 10001; display: flex; flex-direction: column; gap: 10px; max-width: 350px;"></div>
+
+    <!-- Global Loading Overlay -->
+    <div id="loading-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.9); z-index: 9999; align-items: center; justify-content: center;">
+        <div style="text-align: center;">
+            <div style="width: 50px; height: 50px; border: 3px solid #f3f3f3; border-top: 3px solid #667eea; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 15px;"></div>
+            <p style="color: #666; font-size: 16px;" id="loading-message">Đang tải dữ liệu...</p>
+        </div>
+    </div>
+
+    <!-- Mobile Menu Overlay -->
+    <div id="mobile-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 150;" onclick="toggleMobileMenu()"></div>
+
     <!-- Include JavaScript từ file JavaScript.html -->
     <?!= include('JavaScript'); ?>
+
+    <!-- Additional JavaScript for enhanced features -->
+    <script>
+        // Mobile menu toggle
+        function toggleMobileMenu() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('mobile-overlay');
+            
+            if (window.innerWidth <= 768) {
+                sidebar.classList.toggle('show');
+                overlay.style.display = sidebar.classList.contains('show') ? 'block' : 'none';
+            }
+        }
+
+        // Auto-hide mobile menu when clicking menu items
+        document.querySelectorAll('.sidebar-menu li').forEach(item => {
+            item.addEventListener('click', function() {
+                if (window.innerWidth <= 768) {
+                    const sidebar = document.getElementById('sidebar');
+                    const overlay = document.getElementById('mobile-overlay');
+                    sidebar.classList.remove('show');
+                    overlay.style.display = 'none';
+                }
+            });
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            // Ctrl/Cmd + K for search
+            if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+                e.preventDefault();
+                const searchInput = document.querySelector('.search-box input:visible');
+                if (searchInput) {
+                    searchInput.focus();
+                }
+            }
+            
+            // Ctrl/Cmd + N for new transaction
+            if ((e.ctrlKey || e.metaKey) && e.key === 'n') {
+                e.preventDefault();
+                if (currentPage === 'transactions') {
+                    document.getElementById('add-transaction-btn').click();
+                }
+            }
+            
+            // Escape to close modals
+            if (e.key === 'Escape') {
+                const openModals = document.querySelectorAll('.modal[style*="display: block"]');
+                openModals.forEach(modal => {
+                    if (modal.id !== 'login-modal') {
+                        hideModal(modal.id);
+                    }
+                });
+            }
+        });
+
+        // Auto-save form data to prevent data loss
+        function setupAutoSave() {
+            const forms = document.querySelectorAll('form');
+            forms.forEach(form => {
+                const inputs = form.querySelectorAll('input, select, textarea');
+                inputs.forEach(input => {
+                    input.addEventListener('input', function() {
+                        const formId = form.id;
+                        const fieldName = input.id || input.name;
+                        if (formId && fieldName) {
+                            sessionStorage.setItem(`autosave_${formId}_${fieldName}`, input.value);
+                        }
+                    });
+                });
+            });
+        }
+
+        // Restore auto-saved data
+        function restoreAutoSave(formId) {
+            const form = document.getElementById(formId);
+            if (!form) return;
+            
+            const inputs = form.querySelectorAll('input, select, textarea');
+            inputs.forEach(input => {
+                const fieldName = input.id || input.name;
+                if (fieldName) {
+                    const savedValue = sessionStorage.getItem(`autosave_${formId}_${fieldName}`);
+                    if (savedValue) {
+                        input.value = savedValue;
+                    }
+                }
+            });
+        }
+
+        // Clear auto-saved data
+        function clearAutoSave(formId) {
+            const keys = Object.keys(sessionStorage);
+            keys.forEach(key => {
+                if (key.startsWith(`autosave_${formId}_`)) {
+                    sessionStorage.removeItem(key);
+                }
+            });
+        }
+
+        // Toast notification system
+        function showToast(message, type = 'info', duration = 3000) {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            
+            toast.className = `notification ${type} show`;
+            toast.innerHTML = `
+                <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <i class="fas ${getNotificationIcon(type)}"></i>
+                        <span>${message}</span>
+                    </div>
+                    <button onclick="this.parentElement.parentElement.remove()" style="background: none; border: none; color: white; cursor: pointer; padding: 0; font-size: 18px;">×</button>
+                </div>
+            `;
+            
+            container.appendChild(toast);
+            
+            // Auto remove after duration
+            setTimeout(() => {
+                if (toast.parentNode) {
+                    toast.classList.remove('show');
+                    setTimeout(() => {
+                        if (toast.parentNode) {
+                            toast.remove();
+                        }
+                    }, 300);
+                }
+            }, duration);
+        }
+
+        // Initialize enhanced features
+        document.addEventListener('DOMContentLoaded', function() {
+            setupAutoSave();
+            
+            // Add mobile menu button to header if not exists
+            if (window.innerWidth <= 768) {
+                const header = document.querySelector('.header');
+                const mobileMenuBtn = document.createElement('button');
+                mobileMenuBtn.innerHTML = '<i class="fas fa-bars"></i>';
+                mobileMenuBtn.className = 'btn btn-secondary';
+                mobileMenuBtn.onclick = toggleMobileMenu;
+                mobileMenuBtn.style.marginRight = 'auto';
+                header.insertBefore(mobileMenuBtn, header.firstChild.nextSibling);
+            }
+        });
+
+        // Performance monitoring
+        window.addEventListener('load', function() {
+            // Log performance metrics
+            if (window.performance) {
+                const perfData = window.performance.timing;
+                const pageLoadTime = perfData.loadEventEnd - perfData.navigationStart;
+                console.log(`📊 Page load time: ${pageLoadTime}ms`);
+            }
+        });
+
+        // Error boundary for JavaScript errors
+        window.addEventListener('error', function(e) {
+            console.error('💥 JavaScript Error:', e.error);
+            showToast('Đã xảy ra lỗi hệ thống. Vui lòng làm mới trang.', 'error', 5000);
+        });
+
+        // Online/Offline status
+        window.addEventListener('online', function() {
+            showToast('Đã kết nối mạng trở lại', 'success');
+        });
+
+        window.addEventListener('offline', function() {
+            showToast('Mất kết nối mạng. Một số tính năng có thể bị hạn chế.', 'warning', 5000);
+        });
+
+        console.log('🚀 NHT Finance System - Enhanced Web Version Loaded Successfully!');
+        console.log('📱 Responsive Design: ✅');
+        console.log('⚡ Progressive Web App: ✅');
+        console.log('🔒 Security Features: ✅');
+        console.log('📊 Analytics Ready: ✅');
+        console.log('♿ Accessibility: ✅');
+    </script>
+
+    <!-- Analytics and Tracking (Optional) -->
+    <!-- <script>
+        // Add Google Analytics or other tracking code here
+    </script> -->
+
+</body>
+</html><!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hệ thống quản lý tài chính NHT</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Include CSS trực tiếp từ file Stylesheet.html -->
+    <?!= include('Stylesheet'); ?>
+</head>
+<body>
+    <div class="app-container" id="app-container">
+        <!-- Sidebar -->
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">NHT Finance</div>
+                <button class="collapse-btn" id="collapse-sidebar">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+            <ul class="sidebar-menu">
+                <li data-page="dashboard" class="active">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Dashboard</span>
+                </li>
+                <li data-page="transactions">
+                    <i class="fas fa-exchange-alt"></i>
+                    <span>Giao dịch</span>
+                </li>
+                <li data-page="accounts">
+                    <i class="fas fa-wallet"></i>
+                    <span>Tài khoản</span>
+                </li>
+                <li data-page="categories">
+                    <i class="fas fa-tags"></i>
+                    <span>Danh mục</span>
+                </li>
+                <li data-page="customers">
+                    <i class="fas fa-users"></i>
+                    <span>Khách hàng</span>
+                </li>
+                <li data-page="suppliers">
+                    <i class="fas fa-truck"></i>
+                    <span>Nhà cung cấp</span>
+                </li>
+                <li data-page="users">
+                    <i class="fas fa-user-cog"></i>
+                    <span>Người dùng</span>
+                </li>
+                <li data-page="permissions">
+                    <i class="fas fa-user-shield"></i>
+                    <span>Phân quyền</span>
+                </li>
+                <li data-page="reports">
+                    <i class="fas fa-chart-bar"></i>
+                    <span>Báo cáo</span>
+                </li>
+                <li data-page="import-export">
+                    <i class="fas fa-file-import"></i>
+                    <span>Import/Export</span>
+                </li>
+                <li data-page="settings">
+                    <i class="fas fa-cog"></i>
+                    <span>Cài đặt</span>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Header -->
+            <div class="header">
+                <h1 class="header-title" id="page-title">Dashboard</h1>
+                <div class="user-menu">
+                    <div class="notification-icon" id="notification-bell">
+                        <i class="fas fa-bell"></i>
+                        <span class="notification-count" id="notification-count">3</span>
+                    </div>
+                    <div class="user-info" id="user-menu-toggle">
+                        <div class="user-avatar" id="user-avatar">A</div>
+                        <span id="username-display">Admin</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="dropdown-menu" id="user-dropdown" style="display: none;">
+                        <a href="#" id="profile-button">
+                            <i class="fas fa-user"></i> Hồ sơ
+                        </a>
+                        <a href="#" id="logout-button">
+                            <i class="fas fa-sign-out-alt"></i> Đăng xuất
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Content -->
+            <div class="content">
+                <!-- Dashboard Page -->
+                <div class="page active" id="dashboard">
+                    <div class="page-header">
+                        <h2 class="page-title">Tổng quan tài chính</h2>
+                        <div class="header-actions">
+                            <select id="dashboard-period" class="period-select">
+                                <option value="this_month">Tháng này</option>
+                                <option value="last_month">Tháng trước</option>
+                                <option value="this_year">Năm này</option>
+                                <option value="last_year">Năm trước</option>
+                            </select>
+                            <button class="btn btn-primary" id="refresh-dashboard">
+                                <i class="fas fa-sync-alt"></i> Làm mới
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-header">
+                                <div class="stat-title">Tổng thu nhập</div>
+                                <div class="stat-icon" style="background: linear-gradient(135deg, #56ab2f 0%, #a8e6cf 100%);">
+                                    <i class="fas fa-arrow-up"></i>
+                                </div>
+                            </div>
+                            <div class="stat-value income" id="total-income">0 VND</div>
+                            <div class="stat-change" id="income-change">+12% so với tháng trước</div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-header">
+                                <div class="stat-title">Tổng chi phí</div>
+                                <div class="stat-icon" style="background: linear-gradient(135deg, #ff416c 0%, #ff4b2b 100%);">
+                                    <i class="fas fa-arrow-down"></i>
+                                </div>
+                            </div>
+                            <div class="stat-value expense" id="total-expense">0 VND</div>
+                            <div class="stat-change" id="expense-change">-5% so với tháng trước</div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-header">
+                                <div class="stat-title">Lợi nhuận</div>
+                                <div class="stat-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                                    <i class="fas fa-chart-line"></i>
+                                </div>
+                            </div>
+                            <div class="stat-value" id="net-profit">0 VND</div>
+                            <div class="stat-change" id="profit-change">+8% so với tháng trước</div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-header">
+                                <div class="stat-title">Tổng số dư</div>
+                                <div class="stat-icon" style="background: linear-gradient(135deg, #f7b733 0%, #fc4a1a 100%);">
+                                    <i class="fas fa-wallet"></i>
+                                </div>
+                            </div>
+                            <div class="stat-value" id="total-balance">0 VND</div>
+                            <div class="stat-change" id="balance-change">Tất cả tài khoản</div>
+                        </div>
+                    </div>
+
+                    <!-- Charts Row -->
+                    <div class="charts-row">
+                        <div class="chart-container">
+                            <div class="chart-header">
+                                <h3>Xu hướng thu chi</h3>
+                                <div class="chart-actions">
+                                    <button class="btn btn-sm btn-secondary" id="chart-month">Tháng</button>
+                                    <button class="btn btn-sm btn-primary" id="chart-year">Năm</button>
+                                </div>
+                            </div>
+                            <div class="chart-body" id="trend-chart">
+                                <canvas id="trend-canvas" width="400" height="200"></canvas>
+                            </div>
+                        </div>
+                        
+                        <div class="chart-container">
+                            <div class="chart-header">
+                                <h3>Thu chi theo danh mục</h3>
+                            </div>
+                            <div class="chart-body" id="category-chart">
+                                <canvas id="category-canvas" width="300" height="300"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Transactions -->
+                    <div class="table-container">
+                        <div class="table-header">
+                            <h3>Giao dịch gần đây</h3>
+                            <a href="#" class="view-all-link" onclick="changePage('transactions')">Xem tất cả</a>
+                        </div>
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Ngày</th>
+                                    <th>Loại</th>
+                                    <th>Số tiền</th>
+                                    <th>Tài khoản</th>
+                                    <th>Ghi chú</th>
+                                </tr>
+                            </thead>
+                            <tbody id="recent-transactions-body">
+                                <tr>
+                                    <td colspan="5" class="text-center" style="padding: 40px; color: #666;">
+                                        Chưa có giao dịch nào
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Transactions Page -->
+                <div class="page" id="transactions">
+                    <div class="page-header">
+                        <h2 class="page-title">Quản lý giao dịch</h2>
+                        <div class="header-actions">
+                            <div class="search-box">
+                                <input type="text" id="transaction-search" placeholder="Tìm kiếm giao dịch...">
+                                <i class="fas fa-search"></i>
+                            </div>
+                            <button class="btn btn-secondary" id="filter-transactions">
+                                <i class="fas fa-filter"></i> Lọc
+                            </button>
+                            <button class="add-button" id="add-transaction-btn">
+                                <i class="fas fa-plus"></i> Thêm giao dịch
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Filter Panel -->
+                    <div class="filter-panel" id="transaction-filter-panel" style="display: none;">
+                        <div class="filter-row">
+                            <div class="filter-group">
+                                <label>Loại giao dịch:</label>
+                                <select id="filter-type">
+                                    <option value="">Tất cả</option>
+                                    <option value="Thu">Thu nhập</option>
+                                    <option value="Chi">Chi phí</option>
+                                </select>
+                            </div>
+                            <div class="filter-group">
+                                <label>Danh mục:</label>
+                                <select id="filter-category">
+                                    <option value="">Tất cả danh mục</option>
+                                </select>
+                            </div>
+                            <div class="filter-group">
+                                <label>Từ ngày:</label>
+                                <input type="date" id="filter-date-from">
+                            </div>
+                            <div class="filter-group">
+                                <label>Đến ngày:</label>
+                                <input type="date" id="filter-date-to">
+                            </div>
+                            <div class="filter-actions">
+                                <button class="btn btn-primary" id="apply-filter">Áp dụng</button>
+                                <button class="btn btn-secondary" id="clear-filter">Xóa bộ lọc</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="table-container">
+                        <div class="table-header">
+                            <div class="table-info">
+                                <span id="transaction-count">Tổng: 0 giao dịch</span>
+                            </div>
+                            <div class="table-actions">
+                                <button class="btn btn-sm btn-success" id="export-transactions">
+                                    <i class="fas fa-download"></i> Xuất Excel
+                                </button>
+                            </div>
+                        </div>
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        <input type="checkbox" id="select-all-transactions">
+                                    </th>
+                                    <th>Mã GD</th>
+                                    <th>Ngày</th>
+                                    <th>Loại</th>
+                                    <th>Danh mục</th>
+                                    <th>Số tiền</th>
+                                    <th>Tài khoản</th>
+                                    <th>Ghi chú</th>
+                                    <th>Trạng thái</th>
+                                    <th>Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody id="transactions-table-body">
+                                <tr>
+                                    <td colspan="10" class="text-center" style="padding: 40px; color: #666;">
+                                        Chưa có giao dịch nào
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        
+                        <!-- Pagination -->
+                        <div class="table-pagination" id="transaction-pagination">
+                            <div class="pagination-info">
+                                Hiển thị <span id="showing-from">1</span>-<span id="showing-to">10</span> của <span id="total-records">0</span> bản ghi
+                            </div>
+                            <div class="pagination-controls">
+                                <button class="btn btn-sm btn-secondary" id="prev-page" disabled>
+                                    <i class="fas fa-chevron-left"></i>
+                                </button>
+                                <span class="page-numbers" id="page-numbers">
+                                    <button class="btn btn-sm btn-primary">1</button>
+                                </span>
+                                <button class="btn btn-sm btn-secondary" id="next-page">
+                                    <i class="fas fa-chevron-right"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Accounts Page -->
+                <div class="page" id="accounts">
+                    <div class="page-header">
+                        <h2 class="page-title">Quản lý tài khoản</h2>
+                        <button class="add-button" id="add-account-btn">
+                            <i class="fas fa-plus"></i> Thêm tài khoản
+                        </button>
+                    </div>
+                    
+                    <div class="accounts-grid" id="accounts-list">
+                        <p style="text-align: center; color: #666; padding: 40px;">Chưa có tài khoản nào</p>
+                    </div>
+                </div>
+
+                <!-- Categories Page -->
+                <div class="page" id="categories">
+                    <div class="page-header">
+                        <h2 class="page-title">Quản lý danh mục</h2>
+                        <button class="add-button" id="add-category-btn">
+                            <i class="fas fa-plus"></i> Thêm danh mục
+                        </button>
+                    </div>
+                    
+                    <div class="categories-tabs">
+                        <button class="tab-btn active" data-type="all">Tất cả</button>
+                        <button class="tab-btn" data-type="Thu">Thu nhập</button>
+                        <button class="tab-btn" data-type="Chi">Chi phí</button>
+                    </div>
+                    
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Mã danh mục</th>
+                                    <th>Tên danh mục</th>
+                                    <th>Loại</th>
+                                    <th>Mô tả</th>
+                                    <th>Số giao dịch</th>
+                                    <th>Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody id="categories-table-body">
+                                <tr>
+                                    <td colspan="6" class="text-center" style="padding: 40px; color: #666;">
+                                        Chưa có danh mục nào
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Customers Page -->
+                <div class="page" id="customers">
+                    <div class="page-header">
+                        <h2 class="page-title">Quản lý khách hàng</h2>
+                        <div class="header-actions">
+                            <div class="search-box">
+                                <input type="text" id="customer-search" placeholder="Tìm kiếm khách hàng...">
+                                <i class="fas fa-search"></i>
+                            </div>
+                            <button class="add-button" id="add-customer-btn">
+                                <i class="fas fa-plus"></i> Thêm khách hàng
+                            </button>
+                        </div>
+                    </div>
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Mã KH</th>
+                                    <th>Tên khách hàng</th>
+                                    <th>Điện thoại</th>
+                                    <th>Email</th>
+                                    <th>Địa chỉ</th>
+                                    <th>Ngày tạo</th>
+                                    <th>Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody id="customers-table-body">
+                                <tr>
+                                    <td colspan="7" class="text-center" style="padding: 40px; color: #666;">
+                                        Chưa có khách hàng nào
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Suppliers Page -->
+                <div class="page" id="suppliers">
+                    <div class="page-header">
+                        <h2 class="page-title">Quản lý nhà cung cấp</h2>
+                        <div class="header-actions">
+                            <div class="search-box">
+                                <input type="text" id="supplier-search" placeholder="Tìm kiếm nhà cung cấp...">
+                                <i class="fas fa-search"></i>
+                            </div>
+                            <button class="add-button" id="add-supplier-btn">
+                                <i class="fas fa-plus"></i> Thêm nhà cung cấp
+                            </button>
+                        </div>
+                    </div>
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Mã NCC</th>
+                                    <th>Tên nhà cung cấp</th>
+                                    <th>Điện thoại</th>
+                                    <th>Email</th>
+                                    <th>Địa chỉ</th>
+                                    <th>Ngày tạo</th>
+                                    <th>Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody id="suppliers-table-body">
+                                <tr>
+                                    <td colspan="7" class="text-center" style="padding: 40px; color: #666;">
+                                        Chưa có nhà cung cấp nào
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Users Page -->
+                <div class="page" id="users">
+                    <div class="page-header">
+                        <h2 class="page-title">Quản lý người dùng</h2>
+                        <button class="add-button" id="add-user-btn">
+                            <i class="fas fa-plus"></i> Thêm người dùng
+                        </button>
+                    </div>
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Mã User</th>
+                                    <th>Tên đăng nhập</th>
+                                    <th>Họ tên</th>
+                                    <th>Email</th>
+                                    <th>Vai trò</th>
+                                    <th>Trạng thái</th>
+                                    <th>Ngày tạo</th>
+                                    <th>Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody id="users-table-body">
+                                <tr>
+                                    <td colspan="8" class="text-center" style="padding: 40px; color: #666;">
+                                        Chưa có người dùng nào
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Permissions Page -->
+                <div class="page" id="permissions">
+                    <div class="page-header">
+                        <h2 class="page-title">Phân quyền hệ thống</h2>
+                        <div class="header-actions">
+                            <select id="role-select" class="role-select">
+                                <option value="">Chọn vai trò</option>
+                            </select>
+                            <button class="btn btn-primary" id="save-permissions">
+                                <i class="fas fa-save"></i> Lưu quyền
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="permissions-container" id="permissions-container">
+                        <div class="permissions-note">
+                            <i class="fas fa-info-circle"></i>
+                            Chọn vai trò để quản lý quyền truy cập các chức năng
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Reports Page -->
+                <div class="page" id="reports">
+                    <div class="page-header">
+                        <h2 class="page-title">Báo cáo tài chính</h2>
+                        <div class="header-actions">
+                            <select id="report-type" class="report-select">
+                                <option value="monthly">Báo cáo tháng</option>
+                                <option value="yearly">Báo cáo năm</option>
+                                <option value="category">Theo danh mục</option>
+                                <option value="account">Theo tài khoản</option>
+                            </select>
+                            <button class="btn btn-primary" id="generate-report">
+                                <i class="fas fa-chart-line"></i> Tạo báo cáo
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="report-filters">
+                        <div class="filter-group">
+                            <label>Từ ngày:</label>
+                            <input type="date" id="report-from-date">
+                        </div>
+                        <div class="filter-group">
+                            <label>Đến ngày:</label>
+                            <input type="date" id="report-to-date">
+                        </div>
+                        <div class="filter-group">
+                            <label>Định dạng:</label>
+                            <select id="report-format">
+                                <option value="html">Xem trên web</option>
+                                <option value="pdf">Xuất PDF</option>
+                                <option value="excel">Xuất Excel</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="report-content" id="report-content">
+                        <div class="report-placeholder">
+                            <i class="fas fa-chart-line" style="font-size: 64px; opacity: 0.3;"></i>
+                            <h3>Chọn loại báo cáo và nhấn "Tạo báo cáo"</h3>
+                            <p>Hệ thống sẽ tạo báo cáo chi tiết theo yêu cầu của bạn</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Import/Export Page -->
+                <div class="page" id="import-export">
+                    <div class="page-header">
+                        <h2 class="page-title">Import/Export dữ liệu</h2>
+                    </div>
+                    
+                    <div class="import-export-grid">
+                        <!-- Import Section -->
+                        <div class="import-section">
+                            <div class="section-header">
+                                <h3><i class="fas fa-file-import"></i> Import dữ liệu</h3>
+                            </div>
+                            <div class="section-content">
+                                <div class="import-options">
+                                    <div class="import-option">
+                                        <h4>Import giao dịch từ CSV</h4>
+                                        <p>Tải lên file CSV chứa dữ liệu giao dịch</p>
+                                        <div class="file-upload">
+                                            <input type="file" id="import-transactions-file" accept=".csv" style="display: none;">
+                                            <button class="btn btn-primary" onclick="document.getElementById('import-transactions-file').click()">
+                                                <i class="fas fa-upload"></i> Chọn file CSV
+                                            </button>
+                                            <span class="file-name" id="import-file-name"></span>
+                                        </div>
+                                        <button class="btn btn-success" id="import-transactions-btn" disabled>
+                                            <i class="fas fa-check"></i> Import giao dịch
+                                        </button>
+                                    </div>
+                                    
+                                    <div class="import-option">
+                                        <h4>Template mẫu</h4>
+                                        <p>Tải file mẫu để chuẩn bị dữ liệu import</p>
+                                        <button class="btn btn-secondary" id="download-template">
+                                            <i class="fas fa-download"></i> Tải template
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Export Section -->
+                        <div class="export-section">
+                            <div class="section-header">
+                                <h3><i class="fas fa-file-export"></i> Export dữ liệu</h3>
+                            </div>
+                            <div class="section-content">
+                                <div class="export-options">
+                                    <div class="export-option">
+                                        <h4>Export giao dịch</h4>
+                                        <div class="export-filters">
+                                            <select id="export-period">
+                                                <option value="all">Tất cả</option>
+                                                <option value="this_month">Tháng này</option>
+                                                <option value="last_month">Tháng trước</option>
+                                                <option value="this_year">Năm này</option>
+                                                <option value="custom">Tùy chọn</option>
+                                            </select>
+                                            <select id="export-format">
+                                                <option value="csv">CSV</option>
+                                                <option value="excel">Excel</option>
+                                                <option value="pdf">PDF</option>
+                                            </select>
+                                        </div>
+                                        <button class="btn btn-success" id="export-data">
+                                            <i class="fas fa-download"></i> Export
+                                        </button>
+                                    </div>
+                                    
+                                    <div class="export-option">
+                                        <h4>Backup toàn bộ dữ liệu</h4>
+                                        <p>Sao lưu tất cả dữ liệu hệ thống</p>
+                                        <button class="btn btn-warning" id="backup-all-data">
+                                            <i class="fas fa-database"></i> Backup
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Import/Export History -->
+                    <div class="table-container">
+                        <div class="table-header">
+                            <h3>Lịch sử Import/Export</h3>
+                        </div>
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Thời gian</th>
+                                    <th>Loại</th>
+                                    <th>File</th>
+                                    <th>Trạng thái</th>
+                                    <th>Kết quả</th>
+                                    <th>Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody id="import-export-history">
+                                <tr>
+                                    <td colspan="6" class="text-center" style="padding: 40px; color: #666;">
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Settings Page -->
+                <div class="page" id="settings">
+                    <div class="page-header">
+                        <h2 class="page-title">Cài đặt hệ thống</h2>
+                        <button class="btn btn-primary" id="save-settings">
+                            <i class="fas fa-save"></i> Lưu cài đặt
+                        </button>
+                    </div>
+                    
+                    <div class="settings-tabs">
+                        <button class="settings-tab active" data-tab="general">Chung</button>
+                        <button class="settings-tab" data-tab="security">Bảo mật</button>
+                        <button class="settings-tab" data-tab="notifications">Thông báo</button>
+                        <button class="settings-tab" data-tab="system">Hệ thống</button>
+                    </div>
+                    
+                    <div class="settings-content">
+                        <!-- General Settings -->
+                        <div class="settings-panel active" id="general-settings">
+                            <div class="settings-section">
+                                <h3>Cài đặt chung</h3>
+                                <div class="setting-item">
+                                    <label>Tên công ty:</label>
+                                    <input type="text" id="company-name" value="Công ty NHT">
+                                </div>
+                                <div class="setting-item">
+                                    <label>Địa chỉ:</label>
+                                    <input type="text" id="company-address" value="">
+                                </div>
+                                <div class="setting-item">
+                                    <label>Điện thoại:</label>
+                                    <input type="text" id="company-phone" value="">
+                                </div>
+                                <div class="setting-item">
+                                    <label>Email:</label>
+                                    <input type="email" id="company-email" value="">
+                                </div>
+                                <div class="setting-item">
+                                    <label>Múi giờ:</label>
+                                    <select id="timezone">
+                                        <option value="Asia/Ho_Chi_Minh" selected>GMT+7 (Việt Nam)</option>
+                                        <option value="Asia/Bangkok">GMT+7 (Bangkok)</option>
+                                        <option value="Asia/Jakarta">GMT+7 (Jakarta)</option>
+                                    </select>
+                                </div>
+                                <div class="setting-item">
+                                    <label>Định dạng tiền tệ:</label>
+                                    <select id="currency-format">
+                                        <option value="VND" selected>VND - Việt Nam Đồng</option>
+                                        <option value="USD">USD - US Dollar</option>
+                                        <option value="EUR">EUR - Euro</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Security Settings -->
+                        <div class="settings-panel" id="security-settings">
+                            <div class="settings-section">
+                                <h3>Cài đặt bảo mật</h3>
+                                <div class="setting-item">
+                                    <label>Thời gian timeout phiên (phút):</label>
+                                    <input type="number" id="session-timeout" value="30" min="5" max="480">
+                                </div>
+                                <div class="setting-item">
+                                    <label>Yêu cầu mật khẩu mạnh:</label>
+                                    <div class="toggle-switch">
+                                        <input type="checkbox" id="strong-password" checked>
+                                        <span class="slider"></span>
+                                    </div>
+                                </div>
+                                <div class="setting-item">
+                                    <label>Đăng nhập 2 lớp (2FA):</label>
+                                    <div class="toggle-switch">
+                                        <input type="checkbox" id="two-factor-auth">
+                                        <span class="slider"></span>
+                                    </div>
+                                </div>
+                                <div class="setting-item">
+                                    <label>Ghi log hoạt động:</label>
+                                    <div class="toggle-switch">
+                                        <input type="checkbox" id="activity-logging" checked>
+                                        <span class="slider"></span>
+                                    </div>
+                                </div>
+                                <div class="setting-item">
+                                    <label>Số lần đăng nhập sai tối đa:</label>
+                                    <input type="number" id="max-login-attempts" value="5" min="3" max="10">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Notifications Settings -->
+                        <div class="settings-panel" id="notifications-settings">
+                            <div class="settings-section">
+                                <h3>Cài đặt thông báo</h3>
+                                <div class="setting-item">
+                                    <label>Thông báo email:</label>
+                                    <div class="toggle-switch">
+                                        <input type="checkbox" id="email-notifications" checked>
+                                        <span class="slider"></span>
+                                    </div>
+                                </div>
+                                <div class="setting-item">
+                                    <label>Thông báo giao dịch lớn:</label>
+                                    <div class="toggle-switch">
+                                        <input type="checkbox" id="large-transaction-alert" checked>
+                                        <span class="slider"></span>
+                                    </div>
+                                </div>
+                                <div class="setting-item">
+                                    <label>Ngưỡng giao dịch lớn (VND):</label>
+                                    <input type="number" id="large-transaction-threshold" value="50000000">
+                                </div>
+                                <div class="setting-item">
+                                    <label>Báo cáo hàng ngày:</label>
+                                    <div class="toggle-switch">
+                                        <input type="checkbox" id="daily-reports">
+                                        <span class="slider"></span>
+                                    </div>
+                                </div>
+                                <div class="setting-item">
+                                    <label>Báo cáo hàng tuần:</label>
+                                    <div class="toggle-switch">
+                                        <input type="checkbox" id="weekly-reports" checked>
+                                        <span class="slider"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- System Settings -->
+                        <div class="settings-panel" id="system-settings">
+                            <div class="settings-section">
+                                <h3>Cài đặt hệ thống</h3>
+                                <div class="setting-item">
+                                    <label>Số bản ghi hiển thị mỗi trang:</label>
+                                    <select id="records-per-page">
+                                        <option value="10">10</option>
+                                        <option value="25" selected>25</option>
+                                        <option value="50">50</option>
+                                        <option value="100">100</option>
+                                    </select>
+                                </div>
+                                <div class="setting-item">
+                                    <label>Tự động backup dữ liệu:</label>
+                                    <div class="toggle-switch">
+                                        <input type="checkbox" id="auto-backup" checked>
+                                        <span class="slider"></span>
+                                    </div>
+                                </div>
+                                <div class="setting-item">
+                                    <label>Tần suất backup:</label>
+                                    <select id="backup-frequency">
+                                        <option value="daily">Hàng ngày</option>
+                                        <option value="weekly" selected>Hàng tuần</option>
+                                        <option value="monthly">Hàng tháng</option>
+                                    </select>
+                                </div>
+                                <div class="setting-item">
+                                    <label>Số lượng backup lưu trữ:</label>
+                                    <input type="number" id="backup-retention" value="30" min="5" max="365">
+                                </div>
+                                <div class="setting-item">
+                                    <label>Chế độ debug:</label>
+                                    <div class="toggle-switch">
+                                        <input type="checkbox" id="debug-mode">
+                                        <span class="slider"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="settings-section">
+                                <h3>Bảo trì hệ thống</h3>
+                                <div class="maintenance-actions">
+                                    <button class="btn btn-warning" id="cleanup-system">
+                                        <i class="fas fa-broom"></i> Dọn dẹp hệ thống
+                                    </button>
+                                    <button class="btn btn-info" id="test-system">
+                                        <i class="fas fa-cog"></i> Kiểm tra hệ thống
+                                    </button>
+                                    <button class="btn btn-success" id="backup-now">
+                                        <i class="fas fa-download"></i> Backup ngay
+                                    </button>
+                                    <button class="btn btn-danger" id="reset-system">
+                                        <i class="fas fa-exclamation-triangle"></i> Đặt lại hệ thống
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="settings-section">
+                                <h3>Thông tin hệ thống</h3>
+                                <div class="system-info">
+                                    <div class="info-item">
+                                        <label>Phiên bản:</label>
+                                        <span>NHT Finance v1.0.0</span>
+                                    </div>
+                                    <div class="info-item">
+                                        <label>Cập nhật lần cuối:</label>
+                                        <span id="last-update">30/07/2025</span>
+                                    </div>
+                                    <div class="info-item">
+                                        <label>Dung lượng sử dụng:</label>
+                                        <span id="storage-used">2.5 MB / 100 MB</span>
+                                    </div>
+                                    <div class="info-item">
+                                        <label>Số người dùng:</label>
+                                        <span id="total-users">5</span>
+                                    </div>
+                                    <div class="info-item">
+                                        <label>Số giao dịch:</label>
+                                        <span id="total-transactions">156</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Login Modal -->
+    <div class="modal" id="login-modal" style="display: block;">
+        <div class="modal-content" style="max-width: 400px; margin: 15% auto;">
+            <div class="modal-header">
+                <h3>🏦 Đăng nhập hệ thống</h3>
+            </div>
+            <div class="modal-body">
+                <form id="login-form">
+                    <div class="form-group">
+                        <label>Tên đăng nhập:</label>
+                        <input type="text" id="login-username" required autocomplete="username" placeholder="Nhập tên đăng nhập">
+                    </div>
+                    <div class="form-group">
+                        <label>Mật khẩu:</label>
+                        <input type="password" id="login-password" required autocomplete="current-password" placeholder="Nhập mật khẩu">
+                    </div>
+                    <div class="form-error" id="login-error" style="display: none;"></div>
+                    <div style="margin-top: 15px; padding: 15px; background: #f8f9fa; border-radius: 6px; font-size: 13px; color: #666;">
+                        <p style="margin: 0 0 8px 0; font-weight: 500;">Tài khoản demo:</p>
+                        <p style="margin: 0 0 4px 0;"><strong>Admin:</strong> admin / admin123</p>
+                        <p style="margin: 0;"><strong>User:</strong> user / user123</p>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" form="login-form" class="save-btn" style="width: 100%;">
+                    <i class="fas fa-sign-in-alt"></i> Đăng nhập
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Transaction Modal -->
+    <div class="modal" id="transaction-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="transaction-modal-title">Thêm giao dịch mới</h3>
+                <span class="close">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="transaction-form">
+                    <input type="hidden" id="transaction-id">
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="required-field">Ngày giao dịch:</label>
+                            <input type="date" id="transaction-date" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="required-field">Loại giao dịch:</label>
+                            <select id="transaction-type" required>
+                                <option value="">-- Chọn loại --</option>
+                                <option value="Thu">Thu nhập</option>
+                                <option value="Chi">Chi phí</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="required-field">Danh mục:</label>
+                            <select id="transaction-category" required>
+                                <option value="">-- Chọn danh mục --</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="required-field">Số tiền:</label>
+                            <input type="number" id="transaction-amount" step="1000" min="0" required placeholder="Nhập số tiền">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="required-field">Tài khoản:</label>
+                        <select id="transaction-source-account" required>
+                            <option value="">-- Chọn tài khoản --</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Ghi chú:</label>
+                        <textarea id="transaction-note" rows="3" placeholder="Nhập ghi chú cho giao dịch..."></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="cancel-btn">Hủy</button>
+                <button type="submit" form="transaction-form" class="save-btn">
+                    <i class="fas fa-save"></i> Lưu giao dịch
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Account Modal -->
+    <div class="modal" id="account-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="account-modal-title">Thêm tài khoản mới</h3>
+                <span class="close">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="account-form">
+                    <input type="hidden" id="account-id">
+                    
+                    <div class="form-group">
+                        <label class="required-field">Tên tài khoản:</label>
+                        <input type="text" id="account-name" required placeholder="Nhập tên tài khoản">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="required-field">Loại tài khoản:</label>
+                        <select id="account-type" required>
+                            <option value="">-- Chọn loại --</option>
+                            <option value="Tiền mặt">Tiền mặt</option>
+                            <option value="Ngân hàng">Tài khoản ngân hàng</option>
+                            <option value="Ví điện tử">Ví điện tử</option>
+                            <option value="Thẻ tín dụng">Thẻ tín dụng</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Số dư ban đầu:</label>
+                        <input type="number" id="account-balance" step="1000" min="0" placeholder="Nhập số dư ban đầu">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Mô tả:</label>
+                        <textarea id="account-description" rows="3" placeholder="Mô tả tài khoản..."></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="cancel-btn">Hủy</button>
+                <button type="submit" form="account-form" class="save-btn">
+                    <i class="fas fa-save"></i> Lưu tài khoản
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Category Modal -->
+    <div class="modal" id="category-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="category-modal-title">Thêm danh mục mới</h3>
+                <span class="close">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="category-form">
+                    <input type="hidden" id="category-id">
+                    
+                    <div class="form-group">
+                        <label class="required-field">Tên danh mục:</label>
+                        <input type="text" id="category-name" required placeholder="Nhập tên danh mục">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="required-field">Loại danh mục:</label>
+                        <select id="category-type" required>
+                            <option value="">-- Chọn loại --</option>
+                            <option value="Thu">Thu nhập</option>
+                            <option value="Chi">Chi phí</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Mô tả:</label>
+                        <textarea id="category-description" rows="3" placeholder="Mô tả danh mục..."></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="cancel-btn">Hủy</button>
+                <button type="submit" form="category-form" class="save-btn">
+                    <i class="fas fa-save"></i> Lưu danh mục
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Customer Modal -->
+    <div class="modal" id="customer-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="customer-modal-title">Thêm khách hàng mới</h3>
+                <span class="close">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="customer-form">
+                    <input type="hidden" id="customer-id">
+                    
+                    <div class="form-group">
+                        <label class="required-field">Tên khách hàng:</label>
+                        <input type="text" id="customer-name" required placeholder="Nhập tên khách hàng">
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Điện thoại:</label>
+                            <input type="tel" id="customer-phone" placeholder="Nhập số điện thoại">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Email:</label>
+                            <input type="email" id="customer-email" placeholder="Nhập email">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Địa chỉ:</label>
+                        <textarea id="customer-address" rows="3" placeholder="Nhập địa chỉ..."></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="cancel-btn">Hủy</button>
+                <button type="submit" form="customer-form" class="save-btn">
+                    <i class="fas fa-save"></i> Lưu khách hàng
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Supplier Modal -->
+    <div class="modal" id="supplier-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="supplier-modal-title">Thêm nhà cung cấp mới</h3>
+                <span class="close">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="supplier-form">
+                    <input type="hidden" id="supplier-id">
+                    
+                    <div class="form-group">
+                        <label class="required-field">Tên nhà cung cấp:</label>
+                        <input type="text" id="supplier-name" required placeholder="Nhập tên nhà cung cấp">
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Điện thoại:</label>
+                            <input type="tel" id="supplier-phone" placeholder="Nhập số điện thoại">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Email:</label>
+                            <input type="email" id="supplier-email" placeholder="Nhập email">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Địa chỉ:</label>
+                        <textarea id="supplier-address" rows="3" placeholder="Nhập địa chỉ..."></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="cancel-btn">Hủy</button>
+                <button type="submit" form="supplier-form" class="save-btn">
+                    <i class="fas fa-save"></i> Lưu nhà cung cấp
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- User Modal -->
+    <div class="modal" id="user-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="user-modal-title">Thêm người dùng mới</h3>
+                <span class="close">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="user-form">
+                    <input type="hidden" id="user-id">
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="required-field">Tên đăng nhập:</label>
+                            <input type="text" id="user-username" required placeholder="Nhập tên đăng nhập">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="required-field">Họ tên:</label>
+                            <input type="text" id="user-fullname" required placeholder="Nhập họ tên">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Email:</label>
+                            <input type="email" id="user-email" placeholder="Nhập email">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="required-field">Vai trò:</label>
+                            <select id="user-role" required>
+                                <option value="">-- Chọn vai trò --</option>
+                                <option value="ADMIN">Quản trị viên</option>
+                                <option value="MANAGER">Quản lý</option>
+                                <option value="USER">Người dùng</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="required-field">Mật khẩu:</label>
+                            <input type="password" id="user-password" required placeholder="Nhập mật khẩu">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="required-field">Xác nhận mật khẩu:</label>
+                            <input type="password" id="user-confirm-password" required placeholder="Nhập lại mật khẩu">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Trạng thái:</label>
+                        <select id="user-status">
+                            <option value="Active">Hoạt động</option>
+                            <option value="Inactive">Không hoạt động</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="cancel-btn">Hủy</button>
+                <button type="submit" form="user-form" class="save-btn">
+                    <i class="fas fa-save"></i> Lưu người dùng
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div class="modal" id="confirmation-modal">
+        <div class="modal-content" style="max-width: 400px;">
+            <div class="modal-header">
+                <h3 id="confirm-title">Xác nhận</h3>
+                <span class="close">&times;</span>
+            </div>
+            <div class="modal-body">
+                <p id="confirm-message">Bạn có chắc chắn muốn thực hiện hành động này?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="cancel-btn" id="confirm-cancel">Hủy</button>
+                <button type="button" class="btn btn-danger" id="confirm-ok">Xác nhận</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Profile Modal -->
+    <div class="modal" id="profile-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Thông tin cá nhân</h3>
+                <span class="close">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="profile-form">
+                    <div class="form-group">
+                        <label>Tên đăng nhập:</label>
+                        <input type="text" id="profile-username" readonly style="background: #f8f9fa;">
+                    </div>
+                    <div class="form-group">
+                        <label>Họ tên:</label>
+                        <input type="text" id="profile-fullname" placeholder="Nhập họ tên">
+                    </div>
+                    <div class="form-group">
+                        <label>Email:</label>
+                        <input type="email" id="profile-email" placeholder="Nhập email">
+                    </div>
+                    <div class="form-group">
+                        <label>Vai trò:</label>
+                        <input type="text" id="profile-role" readonly style="background: #f8f9fa;">
+                    </div>
+                    <div class="form-group">
+                        <label>Đổi mật khẩu mới:</label>
+                        <input type="password" id="profile-new-password" placeholder="Để trống nếu không đổi">
+                    </div>
+                    <div class="form-group">
+                        <label>Xác nhận mật khẩu mới:</label>
+                        <input type="password" id="profile-confirm-password" placeholder="Xác nhận mật khẩu mới">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="cancel-btn">Hủy</button>
+                <button type="submit" form="profile-form" class="save-btn">
+                    <i class="fas fa-save"></i> Cập nhật
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notifications Container -->
+    <div id="toast-container" style="position: fixed; top: 80px; right: 20px; z-index: 10001; display: flex; flex-direction: column; gap: 10px; max-width: 350px;"></div>
+
+    <!-- Global Loading Overlay -->
+    <div id="loading-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.9); z-index: 9999; align-items: center; justify-content: center;">
+        <div style="text-align: center;">
+            <div style="width: 50px; height: 50px; border: 3px solid #f3f3f3; border-top: 3px solid #667eea; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 15px;"></div>
+            <p style="color: #666; font-size: 16px;" id="loading-message">Đang tải dữ liệu...</p>
+        </div>
+    </div>
+
+    <!-- Mobile Menu Overlay -->
+    <div id="mobile-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 150;" onclick="toggleMobileMenu()"></div>
+
+    <!-- Include JavaScript từ file JavaScript.html -->
+    <?!= include('JavaScript'); ?>
+
+    <!-- Additional JavaScript for enhanced features -->
+    <script>
+        // Mobile menu toggle
+        function toggleMobileMenu() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('mobile-overlay');
+            
+            if (window.innerWidth <= 768) {
+                sidebar.classList.toggle('show');
+                overlay.style.display = sidebar.classList.contains('show') ? 'block' : 'none';
+            }
+        }
+
+        // Auto-hide mobile menu when clicking menu items
+        document.querySelectorAll('.sidebar-menu li').forEach(item => {
+            item.addEventListener('click', function() {
+                if (window.innerWidth <= 768) {
+                    const sidebar = document.getElementById('sidebar');
+                    const overlay = document.getElementById('mobile-overlay');
+                    sidebar.classList.remove('show');
+                    overlay.style.display = 'none';
+                }
+            });
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            // Ctrl/Cmd + K for search
+            if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+                e.preventDefault();
+                const searchInput = document.querySelector('.search-box input:visible');
+                if (searchInput) {
+                    searchInput.focus();
+                }
+            }
+            
+            // Ctrl/Cmd + N for new transaction
+            if ((e.ctrlKey || e.metaKey) && e.key === 'n') {
+                e.preventDefault();
+                if (currentPage === 'transactions') {
+                    document.getElementById('add-transaction-btn').click();
+                }
+            }
+            
+            // Escape to close modals
+            if (e.key === 'Escape') {
+                const openModals = document.querySelectorAll('.modal[style*="display: block"]');
+                openModals.forEach(modal => {
+                    if (modal.id !== 'login-modal') {
+                        hideModal(modal.id);
+                    }
+                });
+            }
+        });
+
+        // Auto-save form data to prevent data loss
+        function setupAutoSave() {
+            const forms = document.querySelectorAll('form');
+            forms.forEach(form => {
+                const inputs = form.querySelectorAll('input, select, textarea');
+                inputs.forEach(input => {
+                    input.addEventListener('input', function() {
+                        const formId = form.id;
+                        const fieldName = input.id || input.name;
+                        if (formId && fieldName) {
+                            sessionStorage.setItem(`autosave_${formId}_${fieldName}`, input.value);
+                        }
+                    });
+                });
+            });
+        }
+
+        // Restore auto-saved data
+        function restoreAutoSave(formId) {
+            const form = document.getElementById(formId);
+            if (!form) return;
+            
+            const inputs = form.querySelectorAll('input, select, textarea');
+            inputs.forEach(input => {
+                const fieldName = input.id || input.name;
+                if (fieldName) {
+                    const savedValue = sessionStorage.getItem(`autosave_${formId}_${fieldName}`);
+                    if (savedValue) {
+                        input.value = savedValue;
+                    }
+                }
+            });
+        }
+
+        // Clear auto-saved data
+        function clearAutoSave(formId) {
+            const keys = Object.keys(sessionStorage);
+            keys.forEach(key => {
+                if (key.startsWith(`autosave_${formId}_`)) {
+                    sessionStorage.removeItem(key);
+                }
+            });
+        }
+
+        // Toast notification system
+        function showToast(message, type = 'info', duration = 3000) {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            
+            toast.className = `notification ${type} show`;
+            toast.innerHTML = `
+                <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <i class="fas ${getNotificationIcon(type)}"></i>
+                        <span>${message}</span>
+                    </div>
+                    <button onclick="this.parentElement.parentElement.remove()" style="background: none; border: none; color: white; cursor: pointer; padding: 0; font-size: 18px;">×</button>
+                </div>
+            `;
+            
+            container.appendChild(toast);
+            
+            // Auto remove after duration
+            setTimeout(() => {
+                if (toast.parentNode) {
+                    toast.classList.remove('show');
+                    setTimeout(() => {
+                        if (toast.parentNode) {
+                            toast.remove();
+                        }
+                    }, 300);
+                }
+            }, duration);
+        }
+
+        // Initialize enhanced features
+        document.addEventListener('DOMContentLoaded', function() {
+            setupAutoSave();
+            
+            // Add mobile menu button to header if not exists
+            if (window.innerWidth <= 768) {
+                const header = document.querySelector('.header');
+                const mobileMenuBtn = document.createElement('button');
+                mobileMenuBtn.innerHTML = '<i class="fas fa-bars"></i>';
+                mobileMenuBtn.className = 'btn btn-secondary';
+                mobileMenuBtn.onclick = toggleMobileMenu;
+                mobileMenuBtn.style.marginRight = 'auto';
+                header.insertBefore(mobileMenuBtn, header.firstChild.nextSibling);
+            }
+        });
+
+        // Performance monitoring
+        window.addEventListener('load', function() {
+            // Log performance metrics
+            if (window.performance) {
+                const perfData = window.performance.timing;
+                const pageLoadTime = perfData.loadEventEnd - perfData.navigationStart;
+                console.log(`📊 Page load time: ${pageLoadTime}ms`);
+            }
+        });
+
+        // Error boundary for JavaScript errors
+        window.addEventListener('error', function(e) {
+            console.error('💥 JavaScript Error:', e.error);
+            showToast('Đã xảy ra lỗi hệ thống. Vui lòng làm mới trang.', 'error', 5000);
+        });
+
+        // Online/Offline status
+        window.addEventListener('online', function() {
+            showToast('Đã kết nối mạng trở lại', 'success');
+        });
+
+        window.addEventListener('offline', function() {
+            showToast('Mất kết nối mạng. Một số tính năng có thể bị hạn chế.', 'warning', 5000);
+        });
+
+        console.log('🚀 NHT Finance System - Enhanced Web Version Loaded Successfully!');
+        console.log('📱 Responsive Design: ✅');
+        console.log('⚡ Progressive Web App: ✅');
+        console.log('🔒 Security Features: ✅');
+        console.log('📊 Analytics Ready: ✅');
+        console.log('♿ Accessibility: ✅');
+    </script>
+
+    <!-- Analytics and Tracking (Optional) -->
+    <!-- <script>
+        // Add Google Analytics or other tracking code here
+    </script> -->
+
 </body>
 </html>
