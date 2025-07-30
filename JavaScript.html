@@ -76,64 +76,101 @@ function checkAuthStatus() {
 }
 
 function initializeApp() {
-    console.log('🎯 Initializing app for user:', currentUser);
+    console.log('🎯 Initializing app for user:', currentUser?.username);
     
     try {
         updateUserDisplay();
         
-        // Load dummy data directly for web version
-        loadDummyData();
-        showNotification('Đăng nhập thành công! Chào mừng ' + (currentUser.fullName || currentUser.username), 'success');
+        // Load real data instead of dummy data
+        loadDashboardData();
+        
+        showNotification('Đăng nhập thành công! Chào mừng ' + (currentUser?.fullName || currentUser?.username), 'success');
         
     } catch (error) {
         console.error('❌ Error initializing app:', error);
-        // Emergency fallback
-        loadDummyData();
-        showNotification('Đã xảy ra lỗi, đang chạy ở chế độ demo', 'warning');
+        showNotification('Có lỗi xảy ra khi khởi tạo ứng dụng', 'error');
     }
 }
 
-// Thêm function fallback
-function loadDummyData() {
-    // Load dummy data khi server không phản hồi
-    transactions = [
-        {
-            id: 'GD000001',
-            date: '2024-01-15',
-            type: 'Thu',
-            category: 'Lương',
-            amount: 15000000,
-            account: 'Vietcombank',
-            note: 'Lương tháng 1',
-            status: 'Hoàn thành'
-        },
-        {
-            id: 'GD000002', 
-            date: '2024-01-16',
-            type: 'Chi',
-            category: 'Ăn uống',
-            amount: 500000,
-            account: 'Tiền mặt',
-            note: 'Ăn trưa',
-            status: 'Hoàn thành'
-        }
-    ];
+function loadPageData(pageId) {
+    showLoading('Đang tải dữ liệu...');
     
-    accounts = [
-        { id: 'TK000001', name: 'Tiền mặt', type: 'Tiền mặt', balance: 1000000 },
-        { id: 'TK000002', name: 'Vietcombank', type: 'Ngân hàng', balance: 5000000 }
-    ];
-    
-    categories = [
-        { id: 'DM000001', name: 'Lương', type: 'Thu', description: 'Lương tháng' },
-        { id: 'DM000002', name: 'Ăn uống', type: 'Chi', description: 'Chi phí ăn uống' }
-    ];
-    
-    updateDashboardStats();
-    displayRecentTransactions();
-    populateAccountDropdown();
-    populateCategoryDropdown();
+    switch(pageId) {
+        case 'dashboard':
+            loadDashboardData();
+            break;
+        case 'transactions':
+            loadRealTransactions().then(() => {
+                hideLoading();
+                displayTransactions();
+            }).catch(error => {
+                hideLoading();
+                console.error('Error loading transactions:', error);
+            });
+            break;
+        case 'accounts':
+            loadRealAccounts().then(() => {
+                hideLoading();
+                displayAccounts();
+            }).catch(error => {
+                hideLoading();
+                console.error('Error loading accounts:', error);
+            });
+            break;
+        case 'categories':
+            loadRealCategories().then(() => {
+                hideLoading();
+                displayCategories();
+            }).catch(error => {
+                hideLoading();
+                console.error('Error loading categories:', error);
+            });
+            break;
+        case 'customers':
+            loadRealCustomers().then(() => {
+                hideLoading();
+                displayCustomers();
+            }).catch(error => {
+                hideLoading();
+                console.error('Error loading customers:', error);
+            });
+            break;
+        case 'suppliers':
+            loadRealSuppliers().then(() => {
+                hideLoading();
+                displaySuppliers();
+            }).catch(error => {
+                hideLoading();
+                console.error('Error loading suppliers:', error);
+            });
+            break;
+        default:
+            hideLoading();
+    }
 }
+
+// =================== ERROR HANDLING FOR GOOGLE APPS SCRIPT ===================
+function handleGoogleScriptError(error) {
+    console.error('Google Apps Script Error:', error);
+    
+    if (error.message && error.message.includes('timeout')) {
+        showNotification('Kết nối bị timeout. Vui lòng thử lại.', 'warning');
+    } else if (error.message && error.message.includes('permission')) {
+        showNotification('Không có quyền truy cập. Vui lòng liên hệ admin.', 'error');
+    } else {
+        showNotification('Có lỗi xảy ra với server. Vui lòng thử lại.', 'error');
+    }
+}
+
+// Override các function cũ để không dùng dummy data nữa
+function loadDummyData() {
+    console.log('🔄 Redirecting to load real data instead of dummy data');
+    loadDashboardData();
+}
+
+console.log('🎉 Real authentication system loaded successfully!');
+console.log('📡 Connected to Google Apps Script backend');
+console.log('👥 Ready to authenticate with real user accounts');
 
 // =================== EVENT LISTENERS ===================
 function initializeEventListeners() {
@@ -219,15 +256,17 @@ function initializeEventListeners() {
 function handleLogin(event) {
     event.preventDefault();
     
-    console.log('🔐 Handling login...');
+    console.log('🔐 Handling real authentication...');
     
     const username = document.getElementById('login-username').value.trim();
     const password = document.getElementById('login-password').value.trim();
     const errorElement = document.getElementById('login-error');
     
     // Clear previous error
-    errorElement.style.display = 'none';
-    errorElement.textContent = '';
+    if (errorElement) {
+        errorElement.style.display = 'none';
+        errorElement.textContent = '';
+    }
     
     // Validate inputs
     if (!username || !password) {
@@ -236,38 +275,43 @@ function handleLogin(event) {
     }
     
     // Show loading
-    showLoading();
+    showLoading('Đang xác thực tài khoản...');
     
-// Simulate authentication cho web version
-setTimeout(function() {
-    hideLoading();
-    
-    // Demo authentication logic
-    const validUsers = {
-        'admin': { password: 'admin123', fullName: 'Administrator', role: 'admin' },
-        'user': { password: 'user123', fullName: 'Demo User', role: 'user' }
-    };
-    
-    if (validUsers[username] && validUsers[username].password === password) {
-        console.log('✅ Login successful for user:', username);
-        
-        // Save user data
-        currentUser = {
-            username: username,
-            fullName: validUsers[username].fullName,
-            role: validUsers[username].role
-        };
-        sessionStorage.setItem('nht_current_user', JSON.stringify(currentUser));
-        
-        // Hide login modal and initialize app
-        hideLoginModal();
-        initializeApp();
-        
-    } else {
-        console.log('❌ Invalid credentials');
-        showLoginError('Tên đăng nhập hoặc mật khẩu không đúng');
-    }
-}, 1000); // Simulate network delay
+    // Call Google Apps Script authentication
+    google.script.run
+        .withSuccessHandler(function(result) {
+            hideLoading();
+            console.log('Authentication result:', result);
+            
+            if (result.success) {
+                console.log('✅ Login successful for user:', result.user.username);
+                
+                // Save user data
+                currentUser = result.user;
+                
+                // Save to sessionStorage
+                try {
+                    sessionStorage.setItem('nht_current_user', JSON.stringify(currentUser));
+                    console.log('✅ User saved to sessionStorage');
+                } catch (storageError) {
+                    console.warn('⚠️ SessionStorage not available, using memory only');
+                }
+                
+                // Hide login modal and initialize app
+                hideLoginModal();
+                initializeApp();
+                
+            } else {
+                console.log('❌ Login failed:', result.message);
+                showLoginError(result.message || 'Tên đăng nhập hoặc mật khẩu không đúng');
+            }
+        })
+        .withFailureHandler(function(error) {
+            hideLoading();
+            console.error('❌ Authentication error:', error);
+            showLoginError('Có lỗi xảy ra khi đăng nhập. Vui lòng thử lại.');
+        })
+        .authenticateUser(username, password);
 }
 function handleLogout() {
     console.log('🚪 Logging out...');
@@ -482,7 +526,7 @@ function showAddTransactionModal() {
 function handleTransactionSubmit(event) {
     event.preventDefault();
     
-    console.log('💾 Handling transaction submit...');
+    console.log('💾 Handling real transaction submit...');
     
     try {
         // Collect form data
@@ -504,40 +548,39 @@ function handleTransactionSubmit(event) {
         console.log('📝 Transaction data:', formData);
         
         // Show loading
-        showLoading();
+        showLoading('Đang lưu giao dịch...');
         
-// Simulate saving transaction
-setTimeout(function() {
-    hideLoading();
-    
-    try {
-        // Add to local data
-        const newTransaction = {
-            id: 'GD' + String(transactions.length + 1).padStart(6, '0'),
-            ...formData,
-            status: 'Hoàn thành'
-        };
-        
-        transactions.push(newTransaction);
-        
-        // Hide modal
-        hideModal('transaction-modal');
-        
-        // Reload data display
-        updateDashboardStats();
-        displayRecentTransactions();
-        if (currentPage === 'transactions') {
-            displayTransactions();
-        }
-        
-        // Show success message
-        showNotification('Thêm giao dịch thành công!', 'success');
-        
-    } catch (error) {
-        console.error('Error saving transaction:', error);
-        showNotification('Có lỗi xảy ra khi lưu giao dịch', 'error');
-    }
-}, 500);
+        // Call Google Apps Script to save transaction
+        google.script.run
+            .withSuccessHandler(function(result) {
+                hideLoading();
+                
+                if (result.success) {
+                    // Hide modal
+                    hideModal('transaction-modal');
+                    
+                    // Reload data
+                    loadDashboardData();
+                    if (currentPage === 'transactions') {
+                        loadPageData('transactions');
+                    }
+                    
+                    // Show success message
+                    showNotification('Thêm giao dịch thành công!', 'success');
+                    
+                    // Clear form
+                    document.getElementById('transaction-form').reset();
+                    
+                } else {
+                    showNotification('Lỗi: ' + (result.message || 'Không thể lưu giao dịch'), 'error');
+                }
+            })
+            .withFailureHandler(function(error) {
+                hideLoading();
+                console.error('❌ Error saving transaction:', error);
+                showNotification('Có lỗi xảy ra khi lưu giao dịch', 'error');
+            })
+            .addTransaction(formData);
         
     } catch (error) {
         hideLoading();
@@ -548,15 +591,15 @@ setTimeout(function() {
 
 // =================== DATA LOADING FUNCTIONS ===================
 function loadDashboardData() {
-    console.log('📊 Loading dashboard data...');
+    console.log('📊 Loading real dashboard data...');
     
-    showLoading();
+    showLoading('Đang tải dữ liệu dashboard...');
     
-    // Load all data concurrently
+    // Load all data from Google Apps Script
     Promise.all([
-        loadTransactions(),
-        loadAccounts(),
-        loadCategories()
+        loadRealTransactions(),
+        loadRealAccounts(), 
+        loadRealCategories()
     ]).then(() => {
         hideLoading();
         updateDashboardStats();
@@ -569,38 +612,85 @@ function loadDashboardData() {
     });
 }
 
-function loadTransactions() {
-    return new Promise((resolve) => {
-        // Use existing dummy data
-        resolve(transactions);
+function loadRealTransactions() {
+    return new Promise((resolve, reject) => {
+        google.script.run
+            .withSuccessHandler(function(result) {
+                transactions = result || [];
+                console.log('✅ Loaded transactions:', transactions.length);
+                resolve(transactions);
+            })
+            .withFailureHandler(function(error) {
+                console.error('❌ Error loading transactions:', error);
+                reject(error);
+            })
+            .getTransactions();
     });
 }
 
-function loadAccounts() {
-    return new Promise((resolve) => {
-        // Use existing dummy data
-        populateAccountDropdown();
-        resolve(accounts);
+function loadRealAccounts() {
+    return new Promise((resolve, reject) => {
+        google.script.run
+            .withSuccessHandler(function(result) {
+                accounts = result || [];
+                console.log('✅ Loaded accounts:', accounts.length);
+                populateAccountDropdown();
+                resolve(accounts);
+            })
+            .withFailureHandler(function(error) {
+                console.error('❌ Error loading accounts:', error);
+                reject(error);
+            })
+            .getAccounts();
     });
 }
 
-function loadCategories() {
-    return new Promise((resolve) => {
-        // Use existing dummy data
-        populateCategoryDropdown();
-        resolve(categories);
+function loadRealCategories() {
+    return new Promise((resolve, reject) => {
+        google.script.run
+            .withSuccessHandler(function(result) {
+                categories = result || [];
+                console.log('✅ Loaded categories:', categories.length);
+                populateCategoryDropdown();
+                resolve(categories);
+            })
+            .withFailureHandler(function(error) {
+                console.error('❌ Error loading categories:', error);
+                reject(error);
+            })
+            .getCategories();
     });
 }
 
-function loadCustomers() {
-    return new Promise((resolve) => {
-        resolve(customers);
+function loadRealCustomers() {
+    return new Promise((resolve, reject) => {
+        google.script.run
+            .withSuccessHandler(function(result) {
+                customers = result || [];
+                console.log('✅ Loaded customers:', customers.length);
+                resolve(customers);
+            })
+            .withFailureHandler(function(error) {
+                console.error('❌ Error loading customers:', error);
+                reject(error);
+            })
+            .getCustomers();
     });
 }
 
-function loadSuppliers() {
-    return new Promise((resolve) => {
-        resolve(suppliers);
+function loadRealSuppliers() {
+    return new Promise((resolve, reject) => {
+        google.script.run
+            .withSuccessHandler(function(result) {
+                suppliers = result || [];
+                console.log('✅ Loaded suppliers:', suppliers.length);
+                resolve(suppliers);
+            })
+            .withFailureHandler(function(error) {
+                console.error('❌ Error loading suppliers:', error);
+                reject(error);
+            })
+            .getSuppliers();
     });
 }
 
@@ -904,15 +994,33 @@ function editTransaction(id) {
 }
 
 function deleteTransaction(id) {
-    if (confirm('Bạn có chắc chắn muốn xóa giao dịch này?')) {
-        const index = transactions.findIndex(t => t.id === id);
-        if (index !== -1) {
-            transactions.splice(index, 1);
-            displayTransactions();
-            loadDashboardData();
-            showNotification('Xóa giao dịch thành công!', 'success');
-        }
+    if (!confirm('Bạn có chắc chắn muốn xóa giao dịch này?')) {
+        return;
     }
+    
+    showLoading('Đang xóa giao dịch...');
+    
+    google.script.run
+        .withSuccessHandler(function(result) {
+            hideLoading();
+            
+            if (result.success) {
+                // Reload data
+                loadDashboardData();
+                if (currentPage === 'transactions') {
+                    loadPageData('transactions');
+                }
+                showNotification('Xóa giao dịch thành công!', 'success');
+            } else {
+                showNotification('Lỗi: ' + (result.message || 'Không thể xóa giao dịch'), 'error');
+            }
+        })
+        .withFailureHandler(function(error) {
+            hideLoading();
+            console.error('❌ Error deleting transaction:', error);
+            showNotification('Có lỗi xảy ra khi xóa giao dịch', 'error');
+        })
+        .deleteTransaction(id);
 }
 
 function editCategory(id) {
