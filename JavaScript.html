@@ -1,4 +1,4 @@
-<!-- JavaScript.html - UPDATED FOR YOUR EXCEL STRUCTURE -->
+<!-- JavaScript.html - DEBUG VERSION FOR DATA LOADING -->
 <script>
 // =================== GLOBAL VARIABLES ===================
 let currentUser = null;
@@ -9,170 +9,7 @@ let transactions = [];
 let customers = [];
 let suppliers = [];
 
-// =================== SIMPLE AUTHENTICATION ===================
-function simpleLogin() {
-  const username = document.getElementById('login-username').value.trim();
-  const password = document.getElementById('login-password').value.trim();
-  
-  // Clear previous error
-  hideLoginError();
-  
-  // Validate input
-  if (!username || !password) {
-    showLoginError('Vui lòng nhập đầy đủ thông tin!');
-    return;
-  }
-  
-  // Show loading
-  showLoading('Đang kiểm tra thông tin...');
-  
-  // Call Google Apps Script
-  google.script.run
-    .withSuccessHandler(handleLoginSuccess)
-    .withFailureHandler(handleLoginError)
-    .checkLogin(username, password);
-}
-
-function handleLoginSuccess(result) {
-  hideLoading();
-  
-  if (result.success) {
-    // Save user info
-    currentUser = result.user;
-    
-    // Hide login modal
-    document.getElementById('login-modal').style.display = 'none';
-    document.body.style.overflow = 'auto';
-    
-    // Update UI
-    updateUserDisplay();
-    
-    // Load app data
-    loadAppData();
-    
-    // Show success message
-    showNotification(`Chào mừng ${currentUser.fullName || currentUser.username}!`, 'success');
-    
-    console.log('✅ Login success:', currentUser);
-  } else {
-    showLoginError(result.message || 'Đăng nhập thất bại');
-  }
-}
-
-function handleLoginError(error) {
-  hideLoading();
-  showLoginError('Lỗi kết nối: ' + error.message);
-  console.error('Login error:', error);
-}
-
-function updateUserDisplay() {
-  if (!currentUser) return;
-  
-  // Update username display
-  const usernameDisplay = document.getElementById('username-display');
-  if (usernameDisplay) {
-    usernameDisplay.textContent = currentUser.fullName || currentUser.username;
-  }
-  
-  // Update avatar
-  const userAvatar = document.getElementById('user-avatar');
-  if (userAvatar) {
-    const firstLetter = (currentUser.fullName || currentUser.username).charAt(0).toUpperCase();
-    userAvatar.textContent = firstLetter;
-  }
-}
-
-function simpleLogout() {
-  currentUser = null;
-  
-  // Show login modal
-  document.getElementById('login-modal').style.display = 'block';
-  document.body.style.overflow = 'hidden';
-  
-  // Clear form
-  document.getElementById('login-username').value = '';
-  document.getElementById('login-password').value = '';
-  hideLoginError();
-  
-  // Reset data
-  transactions = [];
-  accounts = [];
-  categories = [];
-  customers = [];
-  suppliers = [];
-  
-  showNotification('Đã đăng xuất!', 'info');
-  console.log('👋 Logged out');
-}
-
-function requireLogin() {
-  if (!currentUser) {
-    showNotification('Vui lòng đăng nhập!', 'warning');
-    return false;
-  }
-  return true;
-}
-
-// =================== DATA LOADING ===================
-function loadAppData() {
-  showLoading('Đang tải dữ liệu...');
-  
-  google.script.run
-    .withSuccessHandler(function(data) {
-      hideLoading();
-      
-      // Save data to global variables
-      transactions = data.transactions || [];
-      accounts = data.accounts || [];
-      categories = data.categories || [];
-      customers = data.customers || [];
-      suppliers = data.suppliers || [];
-      
-      console.log('📊 Data loaded:');
-      console.log('- Transactions:', transactions.length);
-      console.log('- Accounts:', accounts.length);
-      console.log('- Categories:', categories.length);
-      console.log('- Customers:', customers.length);
-      console.log('- Suppliers:', suppliers.length);
-      
-      // Update UI
-      updateDashboardStats();
-      displayRecentTransactions();
-      populateDropdowns();
-      
-      console.log('✅ App data loaded successfully');
-    })
-    .withFailureHandler(function(error) {
-      hideLoading();
-      showNotification('Không thể tải dữ liệu: ' + error.message, 'error');
-      console.error('Load data error:', error);
-    })
-    .getAllData();
-}
-
 // =================== UTILITY FUNCTIONS ===================
-function showLoginError(message) {
-  const errorEl = document.getElementById('login-error');
-  if (errorEl) {
-    errorEl.textContent = message;
-    errorEl.style.display = 'block';
-    
-    // Shake animation
-    const form = document.getElementById('login-form');
-    if (form) {
-      form.style.animation = 'shake 0.5s ease-in-out';
-      setTimeout(() => form.style.animation = '', 500);
-    }
-  }
-}
-
-function hideLoginError() {
-  const errorEl = document.getElementById('login-error');
-  if (errorEl) {
-    errorEl.style.display = 'none';
-  }
-}
-
 function showLoading(message = 'Đang xử lý...') {
   const overlay = document.getElementById('loading-overlay');
   const messageEl = document.getElementById('loading-message');
@@ -181,6 +18,7 @@ function showLoading(message = 'Đang xử lý...') {
     overlay.style.display = 'flex';
     if (messageEl) messageEl.textContent = message;
   }
+  console.log('🔄 Loading:', message);
 }
 
 function hideLoading() {
@@ -188,6 +26,7 @@ function hideLoading() {
   if (overlay) {
     overlay.style.display = 'none';
   }
+  console.log('✅ Loading hidden');
 }
 
 function showNotification(message, type = 'info') {
@@ -235,105 +74,275 @@ function showNotification(message, type = 'info') {
   console.log(icons[type], message);
 }
 
-// =================== NAVIGATION ===================
-function changePage(pageId) {
-  console.log('📄 Changing to page:', pageId);
-  
-  if (!requireLogin()) return;
-  
-  // Update sidebar
-  document.querySelectorAll('.sidebar-menu li').forEach(item => {
-    item.classList.remove('active');
-  });
-  const activeItem = document.querySelector(`[data-page="${pageId}"]`);
-  if (activeItem) {
-    activeItem.classList.add('active');
-  }
-  
-  // Show page
-  document.querySelectorAll('.page').forEach(page => {
-    page.classList.remove('active');
-  });
-  const targetPage = document.getElementById(pageId);
-  if (targetPage) {
-    targetPage.classList.add('active');
-  }
-  
-  // Update title
-  const titles = {
-    'dashboard': 'Dashboard',
-    'transactions': 'Quản lý giao dịch',
-    'accounts': 'Quản lý tài khoản',
-    'categories': 'Quản lý danh mục',
-    'customers': 'Quản lý khách hàng',
-    'suppliers': 'Quản lý nhà cung cấp',
-    'users': 'Quản lý người dùng',
-    'reports': 'Báo cáo',
-    'settings': 'Cài đặt'
-  };
-  
-  const pageTitle = document.getElementById('page-title');
-  if (pageTitle) {
-    pageTitle.textContent = titles[pageId] || 'Dashboard';
-  }
-  
-  currentPage = pageId;
-  loadPageData(pageId);
-}
-
-function loadPageData(pageId) {
-  switch(pageId) {
-    case 'dashboard':
-      updateDashboardStats();
-      displayRecentTransactions();
-      break;
-    case 'transactions':
-      displayTransactions();
-      break;
-    case 'accounts':
-      displayAccounts();
-      break;
-    case 'categories':
-      displayCategories();
-      break;
-    case 'customers':
-      displayCustomers();
-      break;
-    case 'suppliers':
-      displaySuppliers();
-      break;
-    default:
-      break;
+function showLoginError(message) {
+  const errorEl = document.getElementById('login-error');
+  if (errorEl) {
+    errorEl.textContent = message;
+    errorEl.style.display = 'block';
   }
 }
 
-// =================== DASHBOARD FUNCTIONS - FIXED FOR YOUR DATA ===================
+function hideLoginError() {
+  const errorEl = document.getElementById('login-error');
+  if (errorEl) {
+    errorEl.style.display = 'none';
+  }
+}
+
+function updateElement(id, content) {
+  const element = document.getElementById(id);
+  if (element) {
+    element.textContent = content;
+    console.log(`📝 Updated ${id}: ${content}`);
+  } else {
+    console.log(`❌ Element not found: ${id}`);
+  }
+}
+
+function formatCurrency(amount) {
+  if (amount === null || amount === undefined || isNaN(amount)) return '0 VND';
+  
+  return new Intl.NumberFormat('vi-VN', {
+    style: 'currency',
+    currency: 'VND',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0
+  }).format(amount);
+}
+
+function formatDate(dateStr) {
+  if (!dateStr) return '';
+  
+  try {
+    const date = new Date(dateStr);
+    if (isNaN(date.getTime())) return dateStr;
+    return date.toLocaleDateString('vi-VN');
+  } catch (error) {
+    return dateStr;
+  }
+}
+
+function requireLogin() {
+  if (!currentUser) {
+    showNotification('Vui lòng đăng nhập!', 'warning');
+    return false;
+  }
+  return true;
+}
+
+// =================== AUTHENTICATION ===================
+function simpleLogin() {
+  console.log('🔐 Starting login...');
+  
+  const username = document.getElementById('login-username').value.trim();
+  const password = document.getElementById('login-password').value.trim();
+  
+  hideLoginError();
+  
+  if (!username || !password) {
+    showLoginError('Vui lòng nhập đầy đủ thông tin!');
+    return;
+  }
+  
+  showLoading('Đang kiểm tra thông tin...');
+  
+  console.log('📞 Calling checkLogin with:', username);
+  
+  google.script.run
+    .withSuccessHandler(handleLoginSuccess)
+    .withFailureHandler(handleLoginError)
+    .checkLogin(username, password);
+}
+
+function handleLoginSuccess(result) {
+  console.log('📥 Login response received:', result);
+  hideLoading();
+  
+  if (result && result.success) {
+    currentUser = result.user;
+    
+    const loginModal = document.getElementById('login-modal');
+    if (loginModal) {
+      loginModal.style.display = 'none';
+    }
+    document.body.style.overflow = 'auto';
+    
+    updateUserDisplay();
+    
+    console.log('✅ Login successful, now loading app data...');
+    
+    // IMPORTANT: Load app data immediately after login
+    loadAppData();
+    
+    showNotification(`Chào mừng ${currentUser.fullName || currentUser.username}!`, 'success');
+  } else {
+    showLoginError(result ? result.message : 'Đăng nhập thất bại');
+  }
+}
+
+function handleLoginError(error) {
+  console.error('❌ Login error:', error);
+  hideLoading();
+  showLoginError('Lỗi kết nối: ' + error.message);
+}
+
+function updateUserDisplay() {
+  if (!currentUser) return;
+  
+  const usernameDisplay = document.getElementById('username-display');
+  if (usernameDisplay) {
+    usernameDisplay.textContent = currentUser.fullName || currentUser.username;
+  }
+  
+  const userAvatar = document.getElementById('user-avatar');
+  if (userAvatar) {
+    const firstLetter = (currentUser.fullName || currentUser.username).charAt(0).toUpperCase();
+    userAvatar.textContent = firstLetter;
+  }
+}
+
+// =================== DATA LOADING - ENHANCED DEBUG ===================
+function loadAppData() {
+  console.log('🚀 === STARTING DATA LOAD PROCESS ===');
+  showLoading('Đang tải dữ liệu từ Google Sheets...');
+  
+  console.log('🧪 Testing simple connection first...');
+  
+  // Test simple connection first
+  google.script.run
+    .withSuccessHandler(function(testResult) {
+      console.log('✅ Simple test successful:', testResult);
+      
+      if (testResult && testResult.success) {
+        console.log('🎯 Connection working, now trying getAllData...');
+        
+        // Connection works, now try getAllData
+        google.script.run
+          .withSuccessHandler(function(data) {
+            console.log('📦 getAllData result:', data);
+            console.log('📦 Type:', typeof data);
+            console.log('📦 Is null:', data === null);
+            
+            hideLoading();
+            
+            if (data && typeof data === 'object') {
+              // Save data
+              transactions = data.transactions || [];
+              accounts = data.accounts || [];
+              categories = data.categories || [];
+              customers = data.customers || [];
+              suppliers = data.suppliers || [];
+              
+              console.log('💾 Data saved:', {
+                transactions: transactions.length,
+                accounts: accounts.length,
+                categories: categories.length
+              });
+              
+              // Update UI
+              updateDashboardStats();
+              displayRecentTransactions();
+              displayTransactions();
+              displayAccounts();
+              displayCategories();
+              displayCustomers();
+              displaySuppliers();
+              populateDropdowns();
+              
+              showNotification('Dữ liệu đã được tải thành công!', 'success');
+            } else {
+              console.error('❌ getAllData still returns null');
+              showNotification('getAllData vẫn trả về null', 'error');
+              
+              // Use test data as fallback
+              if (testResult.sampleData) {
+                transactions = testResult.sampleData.transactions || [];
+                accounts = testResult.sampleData.accounts || [];
+                categories = [];
+                updateDashboardStats();
+                displayAccounts();
+                showNotification('Sử dụng dữ liệu test', 'warning');
+              }
+            }
+          })
+          .withFailureHandler(function(error) {
+            hideLoading();
+            console.error('❌ getAllData failed:', error);
+            showNotification('getAllData lỗi: ' + error.message, 'error');
+          })
+          .getAllDataNew();
+          
+      } else {
+        hideLoading();
+        console.error('❌ Simple test failed');
+        showNotification('Test connection thất bại', 'error');
+      }
+    })
+    .withFailureHandler(function(error) {
+      hideLoading();
+      console.error('❌ Simple test error:', error);
+      showNotification('Lỗi test connection: ' + error.message, 'error');
+    })
+    .simpleTest();
+
+}
+
+// =================== DASHBOARD FUNCTIONS - ENHANCED DEBUG ===================
 function updateDashboardStats() {
-  console.log('📊 Updating dashboard stats...');
-  console.log('Transactions data:', transactions);
-  console.log('Accounts data:', accounts);
+  console.log('📊 === UPDATING DASHBOARD STATS ===');
+  console.log('Available transactions for calculation:', transactions);
   
-  // Tính tổng thu nhập (Doanh thu)
-  const totalIncome = transactions
-    .filter(t => t.type === 'Doanh thu' || t.type === 'Thu')
-    .reduce((sum, t) => sum + (parseFloat(t.amount) || 0), 0);
+  if (!Array.isArray(transactions)) {
+    console.error('❌ Transactions is not an array:', typeof transactions);
+    return;
+  }
   
-  // Tính tổng chi phí (Chi phí)
-  const totalExpense = transactions
-    .filter(t => t.type === 'Chi phí' || t.type === 'Chi')
-    .reduce((sum, t) => sum + (parseFloat(t.amount) || 0), 0);
+  // Calculate totals with detailed logging
+  console.log('🧮 Calculating income...');
+  const incomeTransactions = transactions.filter(t => {
+    const isIncome = t.type === 'Doanh thu' || t.type === 'Thu';
+    console.log(`Transaction ${t.id}: type="${t.type}", isIncome=${isIncome}`);
+    return isIncome;
+  });
+  
+  const totalIncome = incomeTransactions.reduce((sum, t) => {
+    const amount = parseFloat(t.amount) || 0;
+    console.log(`Adding income: ${amount}`);
+    return sum + amount;
+  }, 0);
+  
+  console.log('🧮 Calculating expense...');
+  const expenseTransactions = transactions.filter(t => {
+    const isExpense = t.type === 'Chi phí' || t.type === 'Chi';
+    console.log(`Transaction ${t.id}: type="${t.type}", isExpense=${isExpense}`);
+    return isExpense;
+  });
+  
+  const totalExpense = expenseTransactions.reduce((sum, t) => {
+    const amount = parseFloat(t.amount) || 0;
+    console.log(`Adding expense: ${amount}`);
+    return sum + amount;
+  }, 0);
   
   const netProfit = totalIncome - totalExpense;
   
-  // Tính tổng số dư từ "Số dư hiện tại" của accounts
-  const totalBalance = accounts.reduce((sum, acc) => sum + (parseFloat(acc.balance) || 0), 0);
+  console.log('🧮 Calculating balance from accounts...');
+  console.log('Available accounts:', accounts);
   
-  console.log('💰 Stats calculated:');
+  const totalBalance = accounts.reduce((sum, acc) => {
+    const balance = parseFloat(acc.balance) || 0;
+    console.log(`Account ${acc.name}: balance=${balance}`);
+    return sum + balance;
+  }, 0);
+  
+  console.log('💰 FINAL CALCULATIONS:');
   console.log('- Total Income:', totalIncome);
   console.log('- Total Expense:', totalExpense);
   console.log('- Net Profit:', netProfit);
   console.log('- Total Balance:', totalBalance);
   
+  // Update UI elements
+  console.log('📝 Updating dashboard UI elements...');
   updateElement('total-income', formatCurrency(totalIncome));
   updateElement('total-expense', formatCurrency(totalExpense));
   updateElement('net-profit', formatCurrency(netProfit));
@@ -343,23 +352,35 @@ function updateDashboardStats() {
   const profitElement = document.getElementById('net-profit');
   if (profitElement) {
     profitElement.className = netProfit >= 0 ? 'stat-value income' : 'stat-value expense';
+    console.log(`📝 Updated profit color: ${profitElement.className}`);
   }
+  
+  console.log('✅ Dashboard stats update complete');
 }
 
 function displayRecentTransactions() {
+  console.log('📝 === DISPLAYING RECENT TRANSACTIONS ===');
   const tbody = document.getElementById('recent-transactions-body');
-  if (!tbody) return;
+  if (!tbody) {
+    console.error('❌ recent-transactions-body element not found');
+    return;
+  }
   
+  console.log('Available transactions:', transactions);
   tbody.innerHTML = '';
   
   if (!transactions || transactions.length === 0) {
+    console.log('ℹ️ No transactions to display');
     tbody.innerHTML = '<tr><td colspan="5" class="text-center" style="padding: 40px; color: #666;">Chưa có giao dịch nào</td></tr>';
     return;
   }
   
-  // Lấy 5 giao dịch gần nhất
   const recent = transactions.slice(0, 5);
-  recent.forEach(transaction => {
+  console.log(`📋 Displaying ${recent.length} recent transactions`);
+  
+  recent.forEach((transaction, index) => {
+    console.log(`Processing transaction ${index + 1}:`, transaction);
+    
     const row = document.createElement('tr');
     const amountClass = (transaction.type === 'Doanh thu' || transaction.type === 'Thu') ? 'income' : 'expense';
     
@@ -371,22 +392,31 @@ function displayRecentTransactions() {
       <td>${transaction.note || '-'}</td>
     `;
     tbody.appendChild(row);
+    console.log(`✅ Added transaction row ${index + 1}`);
   });
+  
+  console.log('✅ Recent transactions display complete');
 }
 
-// =================== TRANSACTION FUNCTIONS - FIXED FOR YOUR DATA ===================
 function displayTransactions() {
+  console.log('📊 === DISPLAYING TRANSACTIONS TABLE ===');
   const tbody = document.getElementById('transactions-table-body');
-  if (!tbody) return;
+  if (!tbody) {
+    console.error('❌ transactions-table-body element not found');
+    return;
+  }
   
   tbody.innerHTML = '';
   
   if (!transactions || transactions.length === 0) {
+    console.log('ℹ️ No transactions to display in table');
     tbody.innerHTML = '<tr><td colspan="10" class="text-center" style="padding: 40px; color: #666;">Chưa có giao dịch nào</td></tr>';
     return;
   }
   
-  transactions.forEach(transaction => {
+  console.log(`📋 Displaying ${transactions.length} transactions in table`);
+  
+  transactions.forEach((transaction, index) => {
     const row = document.createElement('tr');
     const amountClass = (transaction.type === 'Doanh thu' || transaction.type === 'Thu') ? 'income' : 'expense';
     
@@ -399,7 +429,7 @@ function displayTransactions() {
       <td class="${amountClass}">${formatCurrency(transaction.amount)}</td>
       <td>${transaction.account || '-'}</td>
       <td>${transaction.note || '-'}</td>
-      <td><span class="status-${transaction.status === 'Đã thanh toán' ? 'completed' : 'pending'}">${transaction.status || 'Chưa thanh toán'}</span></td>
+      <td><span class="status-completed">Hoàn thành</span></td>
       <td>
         <button class="btn btn-sm btn-secondary" onclick="editTransaction('${transaction.id}')" title="Sửa">
           <i class="fas fa-edit"></i>
@@ -411,80 +441,32 @@ function displayTransactions() {
     `;
     tbody.appendChild(row);
   });
+  
+  console.log('✅ Transactions table display complete');
 }
 
-function showAddTransactionModal() {
-  if (!requireLogin()) return;
-  
-  console.log('💰 Opening add transaction modal...');
-  
-  const form = document.getElementById('transaction-form');
-  if (form) {
-    form.reset();
-  }
-  
-  const dateInput = document.getElementById('transaction-date');
-  if (dateInput) {
-    dateInput.valueAsDate = new Date();
-  }
-  
-  populateDropdowns();
-  showModal('transaction-modal');
-}
-
-function handleTransactionSubmit(event) {
-  event.preventDefault();
-  
-  if (!requireLogin()) return;
-  
-  console.log('💾 Handling transaction submit...');
-  
-  const formData = {
-    date: document.getElementById('transaction-date').value,
-    type: document.getElementById('transaction-type').value,
-    category: document.getElementById('transaction-category').value,
-    amount: parseFloat(document.getElementById('transaction-amount').value) || 0,
-    account: document.getElementById('transaction-source-account').value,
-    note: document.getElementById('transaction-note').value || ''
-  };
-  
-  if (!formData.date || !formData.type || !formData.category || formData.amount <= 0 || !formData.account) {
-    showNotification('Vui lòng điền đầy đủ thông tin bắt buộc', 'error');
+function displayAccounts() {
+  console.log('💰 === DISPLAYING ACCOUNTS ===');
+  const accountsList = document.getElementById('accounts-list');
+  if (!accountsList) {
+    console.error('❌ accounts-list element not found');
     return;
   }
   
-  showLoading('Đang lưu giao dịch...');
-  
-  google.script.run
-    .withSuccessHandler(function(result) {
-      hideLoading();
-      if (result.success) {
-        hideModal('transaction-modal');
-        loadAppData(); // Reload all data
-        showNotification('Thêm giao dịch thành công!', 'success');
-      } else {
-        showNotification(result.message || 'Lỗi khi thêm giao dịch', 'error');
-      }
-    })
-    .withFailureHandler(function(error) {
-      hideLoading();
-      showNotification('Lỗi server: ' + error.message, 'error');
-    })
-    .addTransaction(formData);
-}
-
-// =================== DISPLAY FUNCTIONS - FIXED FOR YOUR DATA ===================
-function displayAccounts() {
-  const accountsList = document.getElementById('accounts-list');
-  if (!accountsList) return;
+  console.log('Available accounts:', accounts);
   
   if (!accounts || accounts.length === 0) {
+    console.log('ℹ️ No accounts to display');
     accountsList.innerHTML = '<p style="text-align: center; color: #666; padding: 40px;">Chưa có tài khoản nào</p>';
     return;
   }
   
+  console.log(`📋 Displaying ${accounts.length} accounts`);
+  
   let html = '<div class="stats-grid">';
-  accounts.forEach(account => {
+  accounts.forEach((account, index) => {
+    console.log(`Processing account ${index + 1}:`, account);
+    
     const balanceClass = (account.balance || 0) >= 0 ? 'income' : 'expense';
     html += `
       <div class="stat-card">
@@ -495,27 +477,38 @@ function displayAccounts() {
           </div>
         </div>
         <div class="stat-value ${balanceClass}">${formatCurrency(account.balance || 0)}</div>
-        <div class="stat-change">${account.type} ${account.accountNumber ? '• ' + account.accountNumber : ''}</div>
+        <div class="stat-change">${account.type}</div>
       </div>
     `;
   });
   html += '</div>';
   
   accountsList.innerHTML = html;
+  console.log('✅ Accounts display complete');
 }
 
 function displayCategories() {
+  console.log('📁 === DISPLAYING CATEGORIES ===');
   const tbody = document.getElementById('categories-table-body');
-  if (!tbody) return;
+  if (!tbody) {
+    console.error('❌ categories-table-body element not found');
+    return;
+  }
   
+  console.log('Available categories:', categories);
   tbody.innerHTML = '';
   
   if (!categories || categories.length === 0) {
+    console.log('ℹ️ No categories to display');
     tbody.innerHTML = '<tr><td colspan="5" class="text-center" style="padding: 40px; color: #666;">Chưa có danh mục nào</td></tr>';
     return;
   }
   
-  categories.forEach(category => {
+  console.log(`📋 Displaying ${categories.length} categories`);
+  
+  categories.forEach((category, index) => {
+    console.log(`Processing category ${index + 1}:`, category);
+    
     const row = document.createElement('tr');
     row.innerHTML = `
       <td>${category.id}</td>
@@ -533,6 +526,8 @@ function displayCategories() {
     `;
     tbody.appendChild(row);
   });
+  
+  console.log('✅ Categories display complete');
 }
 
 function displayCustomers() {
@@ -602,7 +597,9 @@ function displaySuppliers() {
 }
 
 function populateDropdowns() {
-  // Account dropdown - sử dụng tên từ cấu trúc mới
+  console.log('📋 === POPULATING DROPDOWNS ===');
+  
+  // Account dropdown
   const accountSelect = document.getElementById('transaction-source-account');
   if (accountSelect) {
     accountSelect.innerHTML = '<option value="">-- Chọn tài khoản --</option>';
@@ -612,9 +609,10 @@ function populateDropdowns() {
       option.textContent = `${account.name} (${formatCurrency(account.balance || 0)})`;
       accountSelect.appendChild(option);
     });
+    console.log(`✅ Populated account dropdown with ${accounts.length} options`);
   }
   
-  // Category dropdown - sử dụng tên từ cấu trúc mới
+  // Category dropdown
   const categorySelect = document.getElementById('transaction-category');
   if (categorySelect) {
     categorySelect.innerHTML = '<option value="">-- Chọn danh mục --</option>';
@@ -624,158 +622,124 @@ function populateDropdowns() {
       option.textContent = `${category.icon || '📁'} ${category.name}`;
       categorySelect.appendChild(option);
     });
+    console.log(`✅ Populated category dropdown with ${categories.length} options`);
   }
+}
+
+// =================== MANUAL DATA LOAD FUNCTION FOR TESTING ===================
+function testDataLoad() {
+  console.log('🧪 === MANUAL DATA LOAD TEST ===');
+  loadAppData();
+}
+
+// =================== NAVIGATION ===================
+function changePage(pageId) {
+  console.log('📄 Changing to page:', pageId);
   
-  // Update transaction type options to match your data
-  const typeSelect = document.getElementById('transaction-type');
-  if (typeSelect) {
-    typeSelect.innerHTML = `
-      <option value="">-- Chọn loại --</option>
-      <option value="Doanh thu">Doanh thu</option>
-      <option value="Chi phí">Chi phí</option>
-    `;
-  }
-}
-
-// =================== MODAL FUNCTIONS ===================
-function showModal(modalId) {
-  const modal = document.getElementById(modalId);
-  if (modal) {
-    modal.style.display = 'block';
-    document.body.style.overflow = 'hidden';
-  }
-}
-
-function hideModal(modalId) {
-  const modal = document.getElementById(modalId);
-  if (modal) {
-    modal.style.display = 'none';
-    document.body.style.overflow = 'auto';
-  }
-}
-
-// =================== UTILITY FUNCTIONS ===================
-function toggleUserMenu() {
-  const dropdown = document.getElementById('user-dropdown');
-  if (dropdown) {
-    dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
-  }
-}
-
-function updateElement(id, content) {
-  const element = document.getElementById(id);
-  if (element) {
-    element.textContent = content;
-  }
-}
-
-function formatCurrency(amount) {
-  if (amount === null || amount === undefined || isNaN(amount)) return '0 VND';
-  
-  return new Intl.NumberFormat('vi-VN', {
-    style: 'currency',
-    currency: 'VND',
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0
-  }).format(amount);
-}
-
-function formatDate(dateStr) {
-  if (!dateStr) return '';
-  
-  try {
-    const date = new Date(dateStr);
-    if (isNaN(date.getTime())) return dateStr; // Return original if invalid date
-    return date.toLocaleDateString('vi-VN');
-  } catch (error) {
-    return dateStr;
-  }
-}
-
-// =================== PLACEHOLDER FUNCTIONS ===================
-function editTransaction(id) {
-  if (!requireLogin()) return;
-  showNotification('Chức năng sửa giao dịch đang được phát triển', 'info');
-}
-
-function deleteTransaction(id) {
   if (!requireLogin()) return;
   
-  if (!confirm('Bạn có chắc chắn muốn xóa giao dịch này?')) {
-    return;
+  // Update sidebar
+  document.querySelectorAll('.sidebar-menu li').forEach(item => {
+    item.classList.remove('active');
+  });
+  const activeItem = document.querySelector(`[data-page="${pageId}"]`);
+  if (activeItem) {
+    activeItem.classList.add('active');
   }
   
-  showLoading('Đang xóa giao dịch...');
+  // Show page
+  document.querySelectorAll('.page').forEach(page => {
+    page.classList.remove('active');
+  });
+  const targetPage = document.getElementById(pageId);
+  if (targetPage) {
+    targetPage.classList.add('active');
+  }
   
-  google.script.run
-    .withSuccessHandler(function(result) {
-      hideLoading();
-      if (result.success) {
-        loadAppData(); // Reload data
-        showNotification('Xóa giao dịch thành công!', 'success');
-      } else {
-        showNotification(result.message || 'Lỗi khi xóa giao dịch', 'error');
-      }
-    })
-    .withFailureHandler(function(error) {
-      hideLoading();
-      showNotification('Lỗi server: ' + error.message, 'error');
-    })
-    .deleteTransaction(id);
+  // Update title
+  const titles = {
+    'dashboard': 'Dashboard',
+    'transactions': 'Quản lý giao dịch',
+    'accounts': 'Quản lý tài khoản',
+    'categories': 'Quản lý danh mục',
+    'customers': 'Quản lý khách hàng',
+    'suppliers': 'Quản lý nhà cung cấp',
+    'users': 'Quản lý người dùng',
+    'reports': 'Báo cáo',
+    'settings': 'Cài đặt'
+  };
+  
+  const pageTitle = document.getElementById('page-title');
+  if (pageTitle) {
+    pageTitle.textContent = titles[pageId] || 'Dashboard';
+  }
+  
+  currentPage = pageId;
+  
+  // Refresh data display for current page
+  switch(pageId) {
+    case 'dashboard':
+      updateDashboardStats();
+      displayRecentTransactions();
+      break;
+    case 'transactions':
+      displayTransactions();
+      break;
+    case 'accounts':
+      displayAccounts();
+      break;
+    case 'categories':
+      displayCategories();
+      break;
+    case 'customers':
+      displayCustomers();
+      break;
+    case 'suppliers':
+      displaySuppliers();
+      break;
+  }
 }
 
-function editCategory(id) {
-  if (!requireLogin()) return;
-  showNotification('Chức năng sửa danh mục đang được phát triển', 'info');
-}
-
-function deleteCategory(id) {
-  if (!requireLogin()) return;
-  showNotification('Chức năng xóa danh mục đang được phát triển', 'info');
-}
-
-function editCustomer(id) {
-  if (!requireLogin()) return;
-  showNotification('Chức năng sửa khách hàng đang được phát triển', 'info');
-}
-
-function deleteCustomer(id) {
-  if (!requireLogin()) return;
-  showNotification('Chức năng xóa khách hàng đang được phát triển', 'info');
-}
-
-function editSupplier(id) {
-  if (!requireLogin()) return;
-  showNotification('Chức năng sửa nhà cung cấp đang được phát triển', 'info');
-}
-
-function deleteSupplier(id) {
-  if (!requireLogin()) return;
-  showNotification('Chức năng xóa nhà cung cấp đang được phát triển', 'info');
-}
+// =================== SIMPLE PLACEHOLDER FUNCTIONS ===================
+function editTransaction(id) { showNotification('Chức năng đang phát triển', 'info'); }
+function deleteTransaction(id) { showNotification('Chức năng đang phát triển', 'info'); }
+function editCategory(id) { showNotification('Chức năng đang phát triển', 'info'); }
+function deleteCategory(id) { showNotification('Chức năng đang phát triển', 'info'); }
+function editCustomer(id) { showNotification('Chức năng đang phát triển', 'info'); }
+function deleteCustomer(id) { showNotification('Chức năng đang phát triển', 'info'); }
+function editSupplier(id) { showNotification('Chức năng đang phát triển', 'info'); }
+function deleteSupplier(id) { showNotification('Chức năng đang phát triển', 'info'); }
 
 // =================== EVENT LISTENERS ===================
-function initializeEventListeners() {
-  console.log('🔗 Setting up event listeners...');
+document.addEventListener('DOMContentLoaded', function() {
+  console.log('🚀 === NHT FINANCE SYSTEM INITIALIZATION ===');
   
-  // Login form
+  // Add CSS animations
+  const style = document.createElement('style');
+  style.textContent = `
+    @keyframes slideIn {
+      from { transform: translateX(300px); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      75% { transform: translateX(5px); }
+    }
+  `;
+  document.head.appendChild(style);
+  
+  // Login form event listener
   const loginForm = document.getElementById('login-form');
   if (loginForm) {
     loginForm.addEventListener('submit', function(e) {
       e.preventDefault();
       simpleLogin();
     });
+    console.log('✅ Login form listener attached');
   }
   
-  // Enter key support
-  const passwordField = document.getElementById('login-password');
-  if (passwordField) {
-    passwordField.addEventListener('keypress', function(e) {
-      if (e.key === 'Enter') simpleLogin();
-    });
-  }
-  
-  // Navigation
+  // Navigation menu listeners
   document.querySelectorAll('.sidebar-menu li').forEach(item => {
     item.addEventListener('click', function() {
       const page = this.getAttribute('data-page');
@@ -785,92 +749,37 @@ function initializeEventListeners() {
     });
   });
   
-  // Sidebar collapse
-  const collapseBtn = document.getElementById('collapse-sidebar');
-  if (collapseBtn) {
-    collapseBtn.addEventListener('click', function() {
-      const sidebar = document.getElementById('sidebar');
-      if (sidebar) {
-        sidebar.classList.toggle('collapsed');
-      }
-    });
-  }
-  
-  // User menu
+  // User menu and other listeners
   const userMenuToggle = document.getElementById('user-menu-toggle');
   if (userMenuToggle) {
-    userMenuToggle.addEventListener('click', toggleUserMenu);
-  }
-  
-  // Logout
-  const logoutBtn = document.getElementById('logout-button');
-  if (logoutBtn) {
-    logoutBtn.addEventListener('click', simpleLogout);
-  }
-  
-  // Modal close buttons
-  document.querySelectorAll('.close, .cancel-btn').forEach(btn => {
-    btn.addEventListener('click', function() {
-      const modal = this.closest('.modal');
-      if (modal && modal.id !== 'login-modal') {
-        hideModal(modal.id);
+    userMenuToggle.addEventListener('click', function() {
+      const dropdown = document.getElementById('user-dropdown');
+      if (dropdown) {
+        dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
       }
     });
-  });
-  
-  // Click outside modal
-  window.addEventListener('click', function(event) {
-    if (event.target.classList.contains('modal') && event.target.id !== 'login-modal') {
-      hideModal(event.target.id);
-    }
-  });
-  
-  // Add transaction button
-  const addTransactionBtn = document.getElementById('add-transaction-btn');
-  if (addTransactionBtn) {
-    addTransactionBtn.addEventListener('click', showAddTransactionModal);
   }
   
-  // Transaction form
-  const transactionForm = document.getElementById('transaction-form');
-  if (transactionForm) {
-    transactionForm.addEventListener('submit', handleTransactionSubmit);
+  const logoutBtn = document.getElementById('logout-button');
+  if (logoutBtn) {
+    logoutBtn.addEventListener('click', function() {
+      currentUser = null;
+      document.getElementById('login-modal').style.display = 'block';
+      document.body.style.overflow = 'hidden';
+      showNotification('Đã đăng xuất!', 'info');
+    });
   }
   
   // Dashboard refresh button
   const refreshBtn = document.getElementById('refresh-dashboard');
   if (refreshBtn) {
     refreshBtn.addEventListener('click', function() {
+      console.log('🔄 Manual refresh triggered');
       if (requireLogin()) {
         loadAppData();
       }
     });
   }
-  
-  console.log('✅ Event listeners set up');
-}
-
-// =================== INITIALIZATION ===================
-document.addEventListener('DOMContentLoaded', function() {
-  console.log('🚀 NHT Finance System Loading...');
-  
-  // Add CSS animations
-  const style = document.createElement('style');
-  style.textContent = `
-    @keyframes shake {
-      0%, 100% { transform: translateX(0); }
-      25% { transform: translateX(-5px); }
-      75% { transform: translateX(5px); }
-    }
-    @keyframes slideIn {
-      from { transform: translateX(300px); opacity: 0; }
-      to { transform: translateX(0); opacity: 1; }
-    }
-  `;
-  document.head.appendChild(style);
-  
-  // Initialize event listeners
-  initializeEventListeners();
   
   // Focus username field
   setTimeout(() => {
@@ -880,71 +789,149 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   }, 100);
   
-  console.log('✅ NHT Finance System Ready - Fixed for your Excel structure!');
+  // Create global test function
+  window.testDataLoad = testDataLoad;
+  
+  console.log('✅ === INITIALIZATION COMPLETE ===');
+  console.log('🧪 Use testDataLoad() in console to manually test data loading');
 });
 
-// =================== DEBUGGING UTILITIES ===================
-window.NHTFinance = {
-  currentUser: () => currentUser,
-  currentPage: () => currentPage,
-  data: {
-    accounts: () => accounts,
-    categories: () => categories,
-    transactions: () => transactions,
-    customers: () => customers,
-    suppliers: () => suppliers
-  },
-  debug: {
-    testLogin: (username = 'admin', password = 'admin123') => {
-      document.getElementById('login-username').value = username;
-      document.getElementById('login-password').value = password;
-      simpleLogin();
-    },
-    showData: () => {
-      console.log('=== NHT Finance Debug Info ===');
-      console.log('Current User:', currentUser);
-      console.log('Current Page:', currentPage);
-      console.log('📊 Data Summary:');
-      console.log('- Transactions:', transactions.length, transactions);
-      console.log('- Accounts:', accounts.length, accounts);
-      console.log('- Categories:', categories.length, categories);
-      console.log('- Customers:', customers.length, customers);
-      console.log('- Suppliers:', suppliers.length, suppliers);
-    },
-    testNotification: (message, type) => {
-      showNotification(message || 'Test notification', type || 'info');
-    },
-    reload: () => {
-      if (currentUser) {
-        loadAppData();
+console.log('🎉 JavaScript loaded - DEBUG VERSION with detailed logging!');
+
+// =================== FRONTEND DEBUG TEST FUNCTIONS ===================
+// THÊM VÀO CUỐI FILE JAVASCRIPT.HTML
+
+/**
+ * Test basic connection to backend
+ */
+function testBackendConnection() {
+  console.log('🧪 === TESTING BACKEND CONNECTION ===');
+  
+  showLoading('Testing connection...');
+  
+  google.script.run
+    .withSuccessHandler(function(result) {
+      hideLoading();
+      console.log('✅ Connection test result:', result);
+      showNotification('Backend connection working!', 'success');
+    })
+    .withFailureHandler(function(error) {
+      hideLoading();
+      console.error('❌ Connection test failed:', error);
+      showNotification('Connection test failed: ' + error.message, 'error');
+    })
+    .testConnection();
+}
+
+/**
+ * Test enhanced getAllData
+ */
+function testEnhancedDataLoad() {
+  console.log('🧪 === TESTING ENHANCED DATA LOAD ===');
+  
+  showLoading('Testing enhanced data load...');
+  
+  google.script.run
+    .withSuccessHandler(function(result) {
+      hideLoading();
+      console.log('📦 Enhanced data result:', result);
+      
+      if (result && result.debug) {
+        console.log('🔍 Debug info:', result.debug);
+        showNotification('Enhanced data load successful!', 'success');
+        
+        // Try to update UI with this data
+        if (result.transactions && result.accounts && result.categories) {
+          transactions = result.transactions;
+          accounts = result.accounts;
+          categories = result.categories;
+          customers = result.customers || [];
+          suppliers = result.suppliers || [];
+          
+          updateDashboardStats();
+          displayRecentTransactions();
+          displayAccounts();
+          displayCategories();
+          
+          showNotification('UI updated with enhanced data!', 'success');
+        }
       } else {
-        console.log('Not logged in');
+        showNotification('Enhanced data load returned no debug info', 'warning');
       }
-    },
-    testDataStructure: () => {
-      console.log('🔍 Testing data structure...');
-      if (transactions.length > 0) {
-        console.log('📊 Sample transaction:', transactions[0]);
-        console.log('📊 Transaction fields:', Object.keys(transactions[0]));
+    })
+    .withFailureHandler(function(error) {
+      hideLoading();
+      console.error('❌ Enhanced data load failed:', error);
+      showNotification('Enhanced data load failed: ' + error.message, 'error');
+    })
+    .getAllDataEnhanced();
+}
+
+/**
+ * Test original getAllData with detailed logging
+ */
+function testOriginalDataLoad() {
+  console.log('🧪 === TESTING ORIGINAL GETALLDATA ===');
+  
+  showLoading('Testing original getAllData...');
+  
+  google.script.run
+    .withSuccessHandler(function(result) {
+      hideLoading();
+      console.log('📦 Original getAllData result:', result);
+      console.log('📦 Type of result:', typeof result);
+      console.log('📦 Is null?', result === null);
+      console.log('📦 Is undefined?', result === undefined);
+      
+      if (result) {
+        console.log('✅ Data received successfully');
+        console.log('- Transactions:', result.transactions?.length || 0);
+        console.log('- Accounts:', result.accounts?.length || 0);
+        console.log('- Categories:', result.categories?.length || 0);
+        showNotification('Original getAllData successful!', 'success');
+      } else {
+        console.log('❌ Result is null/undefined');
+        showNotification('Original getAllData returned null', 'error');
       }
-      if (accounts.length > 0) {
-        console.log('💰 Sample account:', accounts[0]);
-        console.log('💰 Account fields:', Object.keys(accounts[0]));
-      }
-      if (categories.length > 0) {
-        console.log('📁 Sample category:', categories[0]);
-        console.log('📁 Category fields:', Object.keys(categories[0]));
-      }
-    }
+    })
+    .withFailureHandler(function(error) {
+      hideLoading();
+      console.error('❌ Original getAllData failed:', error);
+      showNotification('Original getAllData failed: ' + error.message, 'error');
+    })
+    .getAllDataNew();
+}
+
+/**
+ * Force refresh deployment cache
+ */
+function forceRefreshCache() {
+  console.log('🔄 === FORCING CACHE REFRESH ===');
+  
+  // Clear any local storage or cache
+  if (typeof Storage !== "undefined") {
+    localStorage.clear();
+    sessionStorage.clear();
   }
+  
+  // Add random parameter to force new deployment
+  const randomParam = '?v=' + Date.now();
+  console.log('🔄 Cache buster:', randomParam);
+  
+  showNotification('Cache cleared, please redeploy and try again', 'info');
+}
+
+// =================== ADD TO WINDOW OBJECT FOR CONSOLE ACCESS ===================
+window.debugTests = {
+  testConnection: testBackendConnection,
+  testEnhanced: testEnhancedDataLoad,
+  testOriginal: testOriginalDataLoad,
+  clearCache: forceRefreshCache
 };
 
-console.log('🎉 NHT Finance System JavaScript loaded - FIXED FOR YOUR EXCEL STRUCTURE!');
-console.log('🧪 Use NHTFinance.debug.testLogin() to test login quickly');
-console.log('📋 Use NHTFinance.debug.showData() to view current data');
-console.log('🔍 Use NHTFinance.debug.testDataStructure() to check data structure');
-console.log('📊 Key changes:');
-console.log('- Fixed transaction types: "Doanh thu" and "Chi phí"');
-console.log('- Fixed account balance field');
-console.log('- Updated data mapping for all entities');
+console.log('🧪 Debug test functions loaded:');
+console.log('- debugTests.testConnection()');
+console.log('- debugTests.testEnhanced()');
+console.log('- debugTests.testOriginal()'); 
+console.log('- debugTests.clearCache()');
 </script>
