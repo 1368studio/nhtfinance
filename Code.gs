@@ -1,15 +1,15 @@
-// =================== NHT_Code.gs - FIXED SHEET NAMES ===================
+// =================== NHT_Code.gs - FIXED FOR YOUR EXCEL STRUCTURE ===================
 
 /**
- * CẤU HÌNH TÊN SHEET - THAY ĐỔI CHỖ NÀY THEO TÊN SHEET THỰC TẾ CỦA BẠN
+ * CẤU HÌNH TÊN SHEET - KHỚP VỚI FILE EXCEL CỦA BẠN
  */
 const SHEET_NAMES = {
-  TRANSACTIONS: 'Transactions',    // Thay bằng tên sheet giao dịch thực tế
-  ACCOUNTS: 'Accounts',           // Thay bằng tên sheet tài khoản thực tế  
-  CATEGORIES: 'Categories',       // Thay bằng tên sheet danh mục thực tế
-  CUSTOMERS: 'Customers',         // Thay bằng tên sheet khách hàng thực tế
-  SUPPLIERS: 'Suppliers',         // Thay bằng tên sheet nhà cung cấp thực tế
-  USERS: 'Users'                  // Thay bằng tên sheet users thực tế
+  TRANSACTIONS: 'Transactions',
+  ACCOUNTS: 'Accounts',
+  CATEGORIES: 'Categories',
+  CUSTOMERS: 'Customers',
+  SUPPLIERS: 'Suppliers',
+  USERS: 'Users'
 };
 
 /**
@@ -151,12 +151,12 @@ function checkLogin(username, password) {
       };
     }
     
-    // Find user in sheet
+    // Find user in sheet - KHỚP VỚI CẤU TRÚC EXCEL CỦA BẠN
     for (let i = 1; i < data.length; i++) {
       const row = data[i];
-      // CỘT ĐÃ SỬA: Username=1, Password=5, Status=6
+      // Cấu trúc: ID(0), Username(1), Email(2), FullName(3), RoleID(4), Password(5), Status(6)
       
-      const dbUsername = String(row[1] || '').trim();  // Cột B
+      const dbUsername = String(row[1] || '').trim();  // Cột B - Username
       const dbStatus = String(row[6] || '').trim();    // Cột G - Status
       
       if (dbUsername === username && dbStatus === 'Active') {
@@ -169,12 +169,12 @@ function checkLogin(username, password) {
           return {
             success: true,
             user: {
-              id: row[0],           // Cột A
-              username: row[1],     // Cột B
-              email: row[2] || '',  // Cột C
-              fullName: row[3] || username, // Cột D
-              roleId: row[4] || 'USER',     // Cột E
-              status: row[6]        // Cột G
+              id: row[0],           // Cột A - ID
+              username: row[1],     // Cột B - Username
+              email: row[2] || '',  // Cột C - Email
+              fullName: row[3] || username, // Cột D - FullName
+              roleId: row[4] || 'USER',     // Cột E - RoleID
+              status: row[6]        // Cột G - Status
             }
           };
         }
@@ -284,16 +284,16 @@ function initializeSheet(sheet, sheetName) {
 }
 
 /**
- * Get appropriate headers for each sheet type
+ * Get appropriate headers for each sheet type - KHỚP VỚI FILE EXCEL
  */
 function getHeadersForSheet(sheetName) {
   const headerMap = {
-    [SHEET_NAMES.TRANSACTIONS]: ['ID', 'Ngày', 'Loại', 'Danh mục', 'Số tiền', 'Tài khoản', 'Ghi chú', 'Trạng thái'],
-    [SHEET_NAMES.ACCOUNTS]: ['ID', 'Tên tài khoản', 'Loại', 'Số dư', 'Ngày tạo'],
-    [SHEET_NAMES.CATEGORIES]: ['ID', 'Tên danh mục', 'Loại', 'Mô tả'],
-    [SHEET_NAMES.CUSTOMERS]: ['ID', 'Tên', 'Điện thoại', 'Email', 'Địa chỉ', 'Ngày tạo'],
-    [SHEET_NAMES.SUPPLIERS]: ['ID', 'Tên', 'Điện thoại', 'Email', 'Địa chỉ', 'Ngày tạo'],
-    [SHEET_NAMES.USERS]: ['ID', 'Username', 'Email', 'FullName', 'RoleID', 'Password', 'Status', 'CreatedDate']
+    [SHEET_NAMES.TRANSACTIONS]: ['ID', 'Ngày', 'Loại', 'Danh mục', 'Số tiền', 'Tài khoản nguồn', 'Tài khoản đích', 'Ghi chú', 'Số hóa đơn', 'Ngày hóa đơn', 'Tên đối tượng', 'Loại đối tượng', 'Nhân viên/Bộ phận', 'Trạng thái thanh toán', 'Ngày đến hạn', 'Ngày thanh toán'],
+    [SHEET_NAMES.ACCOUNTS]: ['ID', 'Tên', 'Loại', 'Số dư đầu kỳ', 'Số dư hiện tại', 'Icon', 'Thông tin ngân hàng', 'Số tài khoản'],
+    [SHEET_NAMES.CATEGORIES]: ['ID', 'Tên', 'Loại', 'Icon'],
+    [SHEET_NAMES.CUSTOMERS]: ['ID', 'Tên', 'Số điện thoại', 'Email', 'Địa chỉ', 'Mã số thuế', 'Người liên hệ', 'Ghi chú', 'Số dư công nợ'],
+    [SHEET_NAMES.SUPPLIERS]: ['ID', 'Tên', 'Số điện thoại', 'Email', 'Địa chỉ', 'Mã số thuế', 'Người liên hệ', 'Ghi chú', 'Số dư công nợ'],
+    [SHEET_NAMES.USERS]: ['ID', 'Username', 'Email', 'FullName', 'RoleID', 'Password', 'Status']
   };
   
   return headerMap[sheetName] || [];
@@ -362,7 +362,7 @@ function generateSupplierId() {
 }
 
 function generateUserId() {
-  return generateStructuredId('USER', SHEET_NAMES.USERS);
+  return generateStructuredId('NV', SHEET_NAMES.USERS);
 }
 
 // =================== UTILITY FUNCTIONS ===================
@@ -407,10 +407,10 @@ function handleApiError(error) {
   };
 }
 
-// =================== TRANSACTION FUNCTIONS ===================
+// =================== TRANSACTION FUNCTIONS - FIXED FOR YOUR STRUCTURE ===================
 
 /**
- * Get all transactions
+ * Get all transactions - KHỚP VỚI CẤU TRÚC 16 CỘT CỦA BẠN
  */
 function getTransactions() {
   try {
@@ -420,14 +420,22 @@ function getTransactions() {
     if (data.length <= 1) return [];
     
     return data.slice(1).map(row => ({
-      id: row[0],
-      date: row[1],
-      type: row[2],
-      category: row[3],
-      amount: row[4],
-      account: row[5],
-      note: row[6],
-      status: row[7]
+      id: row[0],                    // ID
+      date: row[1],                  // Ngày
+      type: row[2],                  // Loại
+      category: row[3],              // Danh mục
+      amount: row[4],                // Số tiền
+      account: row[5],               // Tài khoản nguồn
+      targetAccount: row[6],         // Tài khoản đích
+      note: row[7],                  // Ghi chú
+      invoiceNumber: row[8],         // Số hóa đơn
+      invoiceDate: row[9],           // Ngày hóa đơn
+      objectName: row[10],           // Tên đối tượng
+      objectType: row[11],           // Loại đối tượng
+      employee: row[12],             // Nhân viên/Bộ phận
+      status: row[13],               // Trạng thái thanh toán
+      dueDate: row[14],              // Ngày đến hạn
+      paymentDate: row[15]           // Ngày thanh toán
     }));
   } catch (error) {
     console.error('Error getting transactions:', error);
@@ -436,7 +444,7 @@ function getTransactions() {
 }
 
 /**
- * Add new transaction
+ * Add new transaction - CẬP NHẬT THEO CẤU TRÚC MỚI
  */
 function addTransaction(transaction) {
   try {
@@ -445,52 +453,28 @@ function addTransaction(transaction) {
     const timestamp = getCurrentDate();
     
     sheet.appendRow([
-      id,
-      transaction.date || timestamp,
-      transaction.type,
-      transaction.category,
-      transaction.amount,
-      transaction.account,
-      transaction.note || '',
-      transaction.status || 'Hoàn thành'
+      id,                                    // ID
+      transaction.date || timestamp,         // Ngày
+      transaction.type,                      // Loại
+      transaction.category,                  // Danh mục
+      transaction.amount,                    // Số tiền
+      transaction.account,                   // Tài khoản nguồn
+      transaction.targetAccount || '',       // Tài khoản đích
+      transaction.note || '',                // Ghi chú
+      transaction.invoiceNumber || '',       // Số hóa đơn
+      transaction.invoiceDate || '',         // Ngày hóa đơn
+      transaction.objectName || '',          // Tên đối tượng
+      transaction.objectType || '',          // Loại đối tượng
+      transaction.employee || '',            // Nhân viên/Bộ phận
+      transaction.status || 'Chưa thanh toán', // Trạng thái thanh toán
+      transaction.dueDate || '',             // Ngày đến hạn
+      transaction.paymentDate || ''          // Ngày thanh toán
     ]);
     
     console.log(`✅ Added transaction: ${id}`);
     return { success: true, id: id, message: 'Thêm giao dịch thành công' };
   } catch (error) {
     console.error('Error adding transaction:', error);
-    return handleApiError(error);
-  }
-}
-
-/**
- * Update transaction
- */
-function updateTransaction(transaction) {
-  try {
-    const sheet = getSheetByName(SHEET_NAMES.TRANSACTIONS);
-    const data = sheet.getDataRange().getValues();
-    
-    for (let i = 1; i < data.length; i++) {
-      if (data[i][0] === transaction.id) {
-        sheet.getRange(i + 1, 1, 1, 8).setValues([[
-          transaction.id,
-          transaction.date,
-          transaction.type,
-          transaction.category,
-          transaction.amount,
-          transaction.account,
-          transaction.note || '',
-          transaction.status || 'Hoàn thành'
-        ]]);
-        console.log(`✅ Updated transaction: ${transaction.id}`);
-        return { success: true, message: 'Cập nhật giao dịch thành công' };
-      }
-    }
-    
-    return { success: false, message: 'Không tìm thấy giao dịch' };
-  } catch (error) {
-    console.error('Error updating transaction:', error);
     return handleApiError(error);
   }
 }
@@ -518,10 +502,10 @@ function deleteTransaction(transactionId) {
   }
 }
 
-// =================== ACCOUNT FUNCTIONS ===================
+// =================== ACCOUNT FUNCTIONS - FIXED FOR YOUR STRUCTURE ===================
 
 /**
- * Get all accounts
+ * Get all accounts - KHỚP VỚI CẤU TRÚC 8 CỘT CỦA BẠN
  */
 function getAccounts() {
   try {
@@ -531,11 +515,14 @@ function getAccounts() {
     if (data.length <= 1) return [];
     
     return data.slice(1).map(row => ({
-      id: row[0],
-      name: row[1],
-      type: row[2],
-      balance: row[3],
-      createdDate: row[4]
+      id: row[0],                    // ID
+      name: row[1],                  // Tên
+      type: row[2],                  // Loại
+      initialBalance: row[3],        // Số dư đầu kỳ
+      balance: row[4],               // Số dư hiện tại
+      icon: row[5],                  // Icon
+      bankInfo: row[6],              // Thông tin ngân hàng
+      accountNumber: row[7]          // Số tài khoản
     }));
   } catch (error) {
     console.error('Error getting accounts:', error);
@@ -550,14 +537,16 @@ function addAccount(account) {
   try {
     const sheet = getSheetByName(SHEET_NAMES.ACCOUNTS);
     const id = generateAccountId();
-    const timestamp = getCurrentDate();
     
     sheet.appendRow([
       id,
       account.name,
       account.type,
-      account.balance || 0,
-      timestamp
+      account.initialBalance || 0,
+      account.balance || account.initialBalance || 0,
+      account.icon || '💰',
+      account.bankInfo || '',
+      account.accountNumber || ''
     ]);
     
     console.log(`✅ Added account: ${id}`);
@@ -568,10 +557,10 @@ function addAccount(account) {
   }
 }
 
-// =================== CATEGORY FUNCTIONS ===================
+// =================== CATEGORY FUNCTIONS - FIXED FOR YOUR STRUCTURE ===================
 
 /**
- * Get all categories
+ * Get all categories - KHỚP VỚI CẤU TRÚC 4 CỘT CỦA BẠN
  */
 function getCategories() {
   try {
@@ -581,10 +570,10 @@ function getCategories() {
     if (data.length <= 1) return [];
     
     return data.slice(1).map(row => ({
-      id: row[0],
-      name: row[1],
-      type: row[2],
-      description: row[3]
+      id: row[0],        // ID
+      name: row[1],      // Tên
+      type: row[2],      // Loại
+      icon: row[3]       // Icon
     }));
   } catch (error) {
     console.error('Error getting categories:', error);
@@ -604,7 +593,7 @@ function addCategory(category) {
       id,
       category.name,
       category.type,
-      category.description || ''
+      category.icon || '📁'
     ]);
     
     console.log(`✅ Added category: ${id}`);
@@ -615,10 +604,10 @@ function addCategory(category) {
   }
 }
 
-// =================== CUSTOMER FUNCTIONS ===================
+// =================== CUSTOMER FUNCTIONS - FIXED FOR YOUR STRUCTURE ===================
 
 /**
- * Get all customers
+ * Get all customers - KHỚP VỚI CẤU TRÚC 9 CỘT CỦA BẠN
  */
 function getCustomers() {
   try {
@@ -628,12 +617,15 @@ function getCustomers() {
     if (data.length <= 1) return [];
     
     return data.slice(1).map(row => ({
-      id: row[0],
-      name: row[1],
-      phone: row[2],
-      email: row[3],
-      address: row[4],
-      createdDate: row[5]
+      id: row[0],          // ID
+      name: row[1],        // Tên
+      phone: row[2],       // Số điện thoại
+      email: row[3],       // Email
+      address: row[4],     // Địa chỉ
+      taxCode: row[5],     // Mã số thuế
+      contact: row[6],     // Người liên hệ
+      note: row[7],        // Ghi chú
+      balance: row[8]      // Số dư công nợ
     }));
   } catch (error) {
     console.error('Error getting customers:', error);
@@ -648,7 +640,6 @@ function addCustomer(customer) {
   try {
     const sheet = getSheetByName(SHEET_NAMES.CUSTOMERS);
     const id = generateCustomerId();
-    const timestamp = getCurrentDate();
     
     sheet.appendRow([
       id,
@@ -656,7 +647,10 @@ function addCustomer(customer) {
       customer.phone || '',
       customer.email || '',
       customer.address || '',
-      timestamp
+      customer.taxCode || '',
+      customer.contact || '',
+      customer.note || '',
+      customer.balance || 0
     ]);
     
     console.log(`✅ Added customer: ${id}`);
@@ -667,10 +661,10 @@ function addCustomer(customer) {
   }
 }
 
-// =================== SUPPLIER FUNCTIONS ===================
+// =================== SUPPLIER FUNCTIONS - FIXED FOR YOUR STRUCTURE ===================
 
 /**
- * Get all suppliers
+ * Get all suppliers - KHỚP VỚI CẤU TRÚC 9 CỘT CỦA BẠN
  */
 function getSuppliers() {
   try {
@@ -680,12 +674,15 @@ function getSuppliers() {
     if (data.length <= 1) return [];
     
     return data.slice(1).map(row => ({
-      id: row[0],
-      name: row[1],
-      phone: row[2],
-      email: row[3],
-      address: row[4],
-      createdDate: row[5]
+      id: row[0],          // ID
+      name: row[1],        // Tên
+      phone: row[2],       // Số điện thoại
+      email: row[3],       // Email
+      address: row[4],     // Địa chỉ
+      taxCode: row[5],     // Mã số thuế
+      contact: row[6],     // Người liên hệ
+      note: row[7],        // Ghi chú
+      balance: row[8]      // Số dư công nợ
     }));
   } catch (error) {
     console.error('Error getting suppliers:', error);
@@ -700,7 +697,6 @@ function addSupplier(supplier) {
   try {
     const sheet = getSheetByName(SHEET_NAMES.SUPPLIERS);
     const id = generateSupplierId();
-    const timestamp = getCurrentDate();
     
     sheet.appendRow([
       id,
@@ -708,7 +704,10 @@ function addSupplier(supplier) {
       supplier.phone || '',
       supplier.email || '',
       supplier.address || '',
-      timestamp
+      supplier.taxCode || '',
+      supplier.contact || '',
+      supplier.note || '',
+      supplier.balance || 0
     ]);
     
     console.log(`✅ Added supplier: ${id}`);
@@ -742,13 +741,14 @@ function getDashboardStats() {
       const amount = parseFloat(transaction.amount) || 0;
       const transactionDate = new Date(transaction.date);
       
-      if (transaction.type === 'Thu') {
+      // Phân loại theo loại giao dịch trong Excel của bạn
+      if (transaction.type === 'Doanh thu' || transaction.type === 'Thu') {
         totalIncome += amount;
         if (transactionDate.getMonth() === currentMonth && 
             transactionDate.getFullYear() === currentYear) {
           monthlyIncome += amount;
         }
-      } else if (transaction.type === 'Chi') {
+      } else if (transaction.type === 'Chi phí' || transaction.type === 'Chi') {
         totalExpense += amount;
         if (transactionDate.getMonth() === currentMonth && 
             transactionDate.getFullYear() === currentYear) {
@@ -757,10 +757,10 @@ function getDashboardStats() {
       }
     });
     
-    // Calculate total balance
+    // Calculate total balance using current balance from accounts
     let totalBalance = 0;
     accounts.forEach(account => {
-      totalBalance += parseFloat(account.balance) || 0;
+      totalBalance += parseFloat(account.balance) || 0; // Sử dụng "Số dư hiện tại"
     });
     
     return {
@@ -826,6 +826,12 @@ function testSystem() {
       const data = getAllData();
       tests.data = true;
       console.log('✅ Data access: OK');
+      console.log('📊 Data summary:');
+      console.log(`- Transactions: ${data.transactions.length}`);
+      console.log(`- Accounts: ${data.accounts.length}`);
+      console.log(`- Categories: ${data.categories.length}`);
+      console.log(`- Customers: ${data.customers.length}`);
+      console.log(`- Suppliers: ${data.suppliers.length}`);
     } catch (error) {
       console.error('❌ Data access: FAILED');
     }
@@ -861,7 +867,7 @@ function getSystemInfo() {
       timezone: ss.getSpreadsheetTimeZone(),
       locale: ss.getSpreadsheetLocale(),
       sheetCount: ss.getSheets().length,
-      version: '2.0.0 - Fixed Sheet Names'
+      version: '2.1.0 - Fixed for Excel Structure'
     };
   } catch (error) {
     console.error('Error getting system info:', error);
@@ -890,8 +896,118 @@ function getAllSheetNames() {
   }
 }
 
+/**
+ * DEBUG: Test data loading with detailed output
+ */
+function testDataLoad() {
+  try {
+    console.log('🔍 Testing data load...');
+    
+    const results = {};
+    
+    // Test Transactions
+    console.log('\n--- Testing Transactions ---');
+    try {
+      const transactions = getTransactions();
+      results.transactions = {
+        success: true,
+        count: transactions.length,
+        sample: transactions.length > 0 ? transactions[0] : null
+      };
+      console.log(`✅ Transactions: ${transactions.length} records`);
+      if (transactions.length > 0) {
+        console.log('📝 Sample transaction:', transactions[0]);
+      }
+    } catch (error) {
+      results.transactions = { success: false, error: error.toString() };
+      console.log('❌ Transactions: FAILED');
+    }
+    
+    // Test Accounts
+    console.log('\n--- Testing Accounts ---');
+    try {
+      const accounts = getAccounts();
+      results.accounts = {
+        success: true,
+        count: accounts.length,
+        sample: accounts.length > 0 ? accounts[0] : null
+      };
+      console.log(`✅ Accounts: ${accounts.length} records`);
+      if (accounts.length > 0) {
+        console.log('📝 Sample account:', accounts[0]);
+      }
+    } catch (error) {
+      results.accounts = { success: false, error: error.toString() };
+      console.log('❌ Accounts: FAILED');
+    }
+    
+    // Test Categories
+    console.log('\n--- Testing Categories ---');
+    try {
+      const categories = getCategories();
+      results.categories = {
+        success: true,
+        count: categories.length,
+        sample: categories.length > 0 ? categories[0] : null
+      };
+      console.log(`✅ Categories: ${categories.length} records`);
+      if (categories.length > 0) {
+        console.log('📝 Sample category:', categories[0]);
+      }
+    } catch (error) {
+      results.categories = { success: false, error: error.toString() };
+      console.log('❌ Categories: FAILED');
+    }
+    
+    // Test Customers
+    console.log('\n--- Testing Customers ---');
+    try {
+      const customers = getCustomers();
+      results.customers = {
+        success: true,
+        count: customers.length,
+        sample: customers.length > 0 ? customers[0] : null
+      };
+      console.log(`✅ Customers: ${customers.length} records`);
+    } catch (error) {
+      results.customers = { success: false, error: error.toString() };
+      console.log('❌ Customers: FAILED');
+    }
+    
+    // Test Suppliers
+    console.log('\n--- Testing Suppliers ---');
+    try {
+      const suppliers = getSuppliers();
+      results.suppliers = {
+        success: true,
+        count: suppliers.length,
+        sample: suppliers.length > 0 ? suppliers[0] : null
+      };
+      console.log(`✅ Suppliers: ${suppliers.length} records`);
+    } catch (error) {
+      results.suppliers = { success: false, error: error.toString() };
+      console.log('❌ Suppliers: FAILED');
+    }
+    
+    return {
+      success: true,
+      results: results,
+      timestamp: new Date().toISOString()
+    };
+    
+  } catch (error) {
+    console.error('❌ Error in testDataLoad:', error);
+    return handleApiError(error);
+  }
+}
+
 // =================== END OF FILE ===================
 
-console.log('✅ NHT_Code.gs loaded successfully with FIXED SHEET NAMES!');
-console.log('🔧 Remember to update SHEET_NAMES constant with your actual sheet names');
-console.log('📋 Use getAllSheetNames() to see all sheets in your spreadsheet');
+console.log('✅ NHT_Code.gs loaded successfully - FIXED FOR YOUR EXCEL STRUCTURE!');
+console.log('📊 Main changes:');
+console.log('- Fixed sheet names: Transactions, Accounts, Categories, etc.');
+console.log('- Fixed column mapping for all sheets');
+console.log('- Fixed transaction types: "Doanh thu" and "Chi phí"');
+console.log('- Updated account balance field');
+console.log('🧪 Use testDataLoad() to verify data loading');
+console.log('🔐 Use testSystem() to test full system');
