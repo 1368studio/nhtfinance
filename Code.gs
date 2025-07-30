@@ -142,13 +142,13 @@ function checkLogin(username, password) {
     // Find user in sheet
     for (let i = 1; i < data.length; i++) {
       const row = data[i];
-      // Columns: ID | Username | Email | FullName | RoleID | CreatedDate | Password | Status
+      // CỘT ĐÃ SỬA: Username=1, Password=5, Status=6
       
-      const dbUsername = String(row[1] || '').trim();
-      const dbStatus = String(row[7] || '').trim();
+      const dbUsername = String(row[1] || '').trim();  // Cột B
+      const dbStatus = String(row[6] || '').trim();    // Cột G - Status
       
       if (dbUsername === username && dbStatus === 'Active') {
-        const dbPassword = String(row[6] || '').trim();
+        const dbPassword = String(row[5] || '').trim(); // Cột F - Password
         
         // Compare password (supports both plain text and hashed)
         if (isPasswordMatch(password, dbPassword)) {
@@ -157,13 +157,12 @@ function checkLogin(username, password) {
           return {
             success: true,
             user: {
-              id: row[0],
-              username: row[1],
-              email: row[2] || '',
-              fullName: row[3] || username,
-              roleId: row[4] || 'USER',
-              createdDate: row[5],
-              status: row[7]
+              id: row[0],           // Cột A
+              username: row[1],     // Cột B
+              email: row[2] || '',  // Cột C
+              fullName: row[3] || username, // Cột D
+              roleId: row[4] || 'USER',     // Cột E
+              status: row[6]        // Cột G
             }
           };
         }
@@ -857,6 +856,7 @@ function getSystemInfo() {
     return { error: error.toString() };
   }
 }
+
 
 // =================== END OF FILE ===================
 
