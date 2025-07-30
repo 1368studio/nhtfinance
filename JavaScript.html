@@ -81,20 +81,15 @@ function initializeApp() {
     try {
         updateUserDisplay();
         
-        // Thử load data từ server trước
-        google.script.run
-            .withSuccessHandler(function(result) {
-                console.log('✅ Sample data check completed:', result);
-                loadDashboardData();
-                showNotification('Đăng nhập thành công! Chào mừng ' + (currentUser.fullName || currentUser.username), 'success');
-            })
-            .withFailureHandler(function(error) {
-                console.error('❌ Error from server:', error);
-                // Fallback: load with dummy data
-                loadDummyData();
-                showNotification('Đăng nhập thành công! (Chế độ offline)', 'warning');
-            })
-            .initializeSampleData();
+// Load dummy data directly for web version
+try {
+    loadDummyData();
+    updateUserDisplay();
+    showNotification('Đăng nhập thành công! Chào mừng ' + (currentUser.fullName || currentUser.username), 'success');
+} catch (error) {
+    console.error('❌ Error initializing app:', error);
+    showNotification('Đã xảy ra lỗi, đang chạy ở chế độ demo', 'warning');
+}
         
     } catch (error) {
         console.error('❌ Error initializing app:', error);
@@ -249,33 +244,36 @@ function handleLogin(event) {
     // Show loading
     showLoading();
     
-    // Authenticate với server
-    google.script.run
-        .withSuccessHandler(function(result) {
-            hideLoading();
-            if (result.success) {
-                console.log('✅ Login successful for user:', result.user.username);
-                
-                // Save user data
-                currentUser = result.user;
-                sessionStorage.setItem('nht_current_user', JSON.stringify(result.user));
-                
-                // Hide login modal and initialize app
-                hideLoginModal();
-                initializeApp();
-                
-            } else {
-                console.log('❌ Invalid credentials');
-                showLoginError(result.message || 'Tên đăng nhập hoặc mật khẩu không đúng');
-            }
-        })
-        .withFailureHandler(function(error) {
-            hideLoading();
-            console.error('❌ Login error:', error);
-            showLoginError('Có lỗi xảy ra khi đăng nhập. Vui lòng thử lại.');
-        })
-        .authenticateUser(username, password);
-}
+// Simulate authentication cho web version
+setTimeout(function() {
+    hideLoading();
+    
+    // Demo authentication logic
+    const validUsers = {
+        'admin': { password: 'admin123', fullName: 'Administrator', role: 'admin' },
+        'user': { password: 'user123', fullName: 'Demo User', role: 'user' }
+    };
+    
+    if (validUsers[username] && validUsers[username].password === password) {
+        console.log('✅ Login successful for user:', username);
+        
+        // Save user data
+        currentUser = {
+            username: username,
+            fullName: validUsers[username].fullName,
+            role: validUsers[username].role
+        };
+        sessionStorage.setItem('nht_current_user', JSON.stringify(currentUser));
+        
+        // Hide login modal and initialize app
+        hideLoginModal();
+        initializeApp();
+        
+    } else {
+        console.log('❌ Invalid credentials');
+        showLoginError('Tên đăng nhập hoặc mật khẩu không đúng');
+    }
+}, 1000); // Simulate network delay
 
 function handleLogout() {
     console.log('🚪 Logging out...');
@@ -514,34 +512,38 @@ function handleTransactionSubmit(event) {
         // Show loading
         showLoading();
         
-        // Save to server
-        google.script.run
-            .withSuccessHandler(function(result) {
-                hideLoading();
-                if (result.success) {
-                    console.log('✅ Transaction saved successfully');
-                    
-                    // Hide modal
-                    hideModal('transaction-modal');
-                    
-                    // Reload data
-                    loadDashboardData();
-                    if (currentPage === 'transactions') {
-                        loadTransactions().then(() => displayTransactions());
-                    }
-                    
-                    // Show success message
-                    showNotification('Thêm giao dịch thành công!', 'success');
-                } else {
-                    showNotification(result.message || 'Có lỗi xảy ra khi lưu giao dịch', 'error');
-                }
-            })
-            .withFailureHandler(function(error) {
-                hideLoading();
-                console.error('❌ Error saving transaction:', error);
-                showNotification('Có lỗi xảy ra khi lưu giao dịch', 'error');
-            })
-            .addTransaction(formData);
+// Simulate saving transaction
+setTimeout(function() {
+    hideLoading();
+    
+    try {
+        // Add to local data
+        const newTransaction = {
+            id: 'GD' + String(transactions.length + 1).padStart(6, '0'),
+            ...formData,
+            status: 'Hoàn thành'
+        };
+        
+        transactions.push(newTransaction);
+        
+        // Hide modal
+        hideModal('transaction-modal');
+        
+        // Reload data display
+        updateDashboardStats();
+        displayRecentTransactions();
+        if (currentPage === 'transactions') {
+            displayTransactions();
+        }
+        
+        // Show success message
+        showNotification('Thêm giao dịch thành công!', 'success');
+        
+    } catch (error) {
+        console.error('Error saving transaction:', error);
+        showNotification('Có lỗi xảy ra khi lưu giao dịch', 'error');
+    }
+}, 500);
         
     } catch (error) {
         hideLoading();
@@ -574,64 +576,37 @@ function loadDashboardData() {
 }
 
 function loadTransactions() {
-    return new Promise((resolve, reject) => {
-        google.script.run
-            .withSuccessHandler(function(result) {
-                transactions = result || [];
-                resolve(transactions);
-            })
-            .withFailureHandler(reject)
-            .getTransactions();
+    return new Promise((resolve) => {
+        // Use existing dummy data
+        resolve(transactions);
     });
 }
 
 function loadAccounts() {
-    return new Promise((resolve, reject) => {
-        google.script.run
-            .withSuccessHandler(function(result) {
-                accounts = result || [];
-                populateAccountDropdown();
-                resolve(accounts);
-            })
-            .withFailureHandler(reject)
-            .getAccounts();
+    return new Promise((resolve) => {
+        // Use existing dummy data
+        populateAccountDropdown();
+        resolve(accounts);
     });
 }
 
 function loadCategories() {
-    return new Promise((resolve, reject) => {
-        google.script.run
-            .withSuccessHandler(function(result) {
-                categories = result || [];
-                populateCategoryDropdown();
-                resolve(categories);
-            })
-            .withFailureHandler(reject)
-            .getCategories();
+    return new Promise((resolve) => {
+        // Use existing dummy data
+        populateCategoryDropdown();
+        resolve(categories);
     });
 }
 
 function loadCustomers() {
-    return new Promise((resolve, reject) => {
-        google.script.run
-            .withSuccessHandler(function(result) {
-                customers = result || [];
-                resolve(customers);
-            })
-            .withFailureHandler(reject)
-            .getCustomers();
+    return new Promise((resolve) => {
+        resolve(customers);
     });
 }
 
 function loadSuppliers() {
-    return new Promise((resolve, reject) => {
-        google.script.run
-            .withSuccessHandler(function(result) {
-                suppliers = result || [];
-                resolve(suppliers);
-            })
-            .withFailureHandler(reject)
-            .getSuppliers();
+    return new Promise((resolve) => {
+        resolve(suppliers);
     });
 }
 
