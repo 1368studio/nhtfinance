@@ -81,15 +81,9 @@ function initializeApp() {
     try {
         updateUserDisplay();
         
-// Load dummy data directly for web version
-try {
-    loadDummyData();
-    updateUserDisplay();
-    showNotification('Đăng nhập thành công! Chào mừng ' + (currentUser.fullName || currentUser.username), 'success');
-} catch (error) {
-    console.error('❌ Error initializing app:', error);
-    showNotification('Đã xảy ra lỗi, đang chạy ở chế độ demo', 'warning');
-}
+        // Load dummy data directly for web version
+        loadDummyData();
+        showNotification('Đăng nhập thành công! Chào mừng ' + (currentUser.fullName || currentUser.username), 'success');
         
     } catch (error) {
         console.error('❌ Error initializing app:', error);
